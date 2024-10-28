@@ -1,4 +1,8 @@
 function [M, C, K] = get_mck(m, c, k, ndof)
+    
+
+    % Relative coordinates.
+    
     M = zeros(ndof, ndof);
     C = zeros(ndof, ndof);
     K = zeros(ndof, ndof);

@@ -4,69 +4,122 @@ clear
 close all
 
 %%
-ndof = 1;
-rng(42);
+% For reproducibility:
+rng(1111);
 
-barrier = 0.02;
+% Is Base motion / non-stationary (excitation):
 is_base = true;
-m = 1*ones(1,ndof); %mass vector
-damping = 5*ones(1,ndof); %damping vector
-stiffness = 100*ones(1,ndof); %stiffness vector
-ex = 0.5*ones(1,ndof);
-ev = 0*ones(1,ndof);
-T = 2;
-b0 = 0.15;
-S0 = 1;
-alpha = 0.75;
+nonstat = true;
 
-[M, C, K] = get_mck(m, damping, stiffness, ndof);
+% Number of DOFs:
+ndof = 2;
 
-%% plot ps
-% Maximum frequency of the excitation process.
+% Fractional derivative:
+q = 0.5; 
+
+% Nonlinearity parameter:
+epx = 0.0*ones(1,ndof);
+
+% Mass, damping, and stiffness vectors: 
+mass = 1*ones(1,ndof); 
+damping = 10*ones(1,ndof);
+stiffness = 100*ones(1,ndof);
+
+% Maximum time:
+T = 5;
+
+% Barrier:
+barrier = 0.01;
+
+% Time increment for the Monte Carlo simulation.
+dT = 0.01; %dT = 0.0001;
+
+% Construct matrices M, C, and K:
+[M, C, K] = get_mck(mass, damping, stiffness, ndof);
+
+% Maximum frequency of the power spectrum:
 fmax_ps = 50; 
 
-vec_time = linspace(0, T, 40);
-vec_freq = linspace(0, fmax_ps, 41);
+% Number of samples in the MCS:
+ns = 240;
 
-for i=1:numel(vec_time)
-    for j=1:numel(vec_freq)
-        f = vec_freq(j);
-        t = vec_time(i);
-        psec(i,j) = evolutionary_power_spectrum(f, t, S0, b0);
-    end
-end
-
-% figure
-% surf(vec_time,vec_freq,psec')
-
-%% statistical_linearization
-disp("sl")
+% Discretization in time and frequency for the Statistical Linearization:
 ntime = 100;
 nfreq = 1000;
+
+%% Monte Carlo Simulation
+
+run_mcs = input('Run Monte Carlo Simulation (Yes=1, No=0):');
+
+if run_mcs
+    disp('Running MCS:')
+    
+    [varx_mcs, time_out, first_passage_time] = ...
+        monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,...
+        nonstat, is_base,T,dT, barrier);
+
+end
+
+%% Statistical Linearization
+disp("Running Statistical Linearization:")
+
 time = linspace(0, T, ntime);
-omega_natural = sqrt(eig(inv(M)*K));
-freq = linspace(0,max(omega_natural)*3,nfreq);
+omega_n = sqrt(eig(inv(M)*K));
+freq = linspace(0,fmax_ps,nfreq);
 
-[var_displacement, var_velocity, conv, k_eq, c_eq] = statistical_linearization(m, damping, stiffness, M, C, K, freq, time, ndof, S0, b0, ex, ev, alpha);
+[varx_sl, varv_sl, conv, k_eq, c_eq] = ...
+    statistical_linearization(mass, damping, stiffness, M, C, K,...
+    freq, time, ndof, epx, q, is_base);
 
-%% stochastic averaging
-disp("sa")
-omega_eq_2 = var_velocity./var_displacement;
-c = var_displacement;
+%% Equivalent damping and stiffness
+
+omega_eq_2 = varv_sl./varx_sl;
+omega_eq_2(:,1) = omega_eq_2(:,2);
 
 for i=1:ndof
-    dc(i,:) = gradient(c(i,:), time);
-end
-beta_eq = pi.*evolutionary_power_spectrum(sqrt(omega_eq_2), time, S0, b0)./(omega_eq_2.*c) - dc./c;
 
-%% c(t)
-disp("c(t)")
-epsilon = 0.5;
-tspan = time;
+    for j=1:numel(time)
+        t=time(j);
+        sig2t = varx_sl(i,j);
+        Sw = @(x)( evolutionary_power_spectrum(x, t) );
+        Sx = @(x,y)( Sw(x)./( (omega_eq_2(i,j) - x.^2).^2 + (y*x).^2 )  );
+        sfun = @(y) ( (sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
+
+        bt = fminbnd(sfun,0.01,500);
+        beq(i,j)=bt;
+
+    end
+    beq(i,1) = beq(i,2);
+
+end
+
+beta_eq = beq;
+
+
+%%
+figure('color',[1 1 1]);
+for i=1:ndof
+    subplot(ndof,1,i); 
+    hold on
+    plot(time,omega_eq_2(i,:),'linewidth',2) % MCS
+    xlabel('Time','interpreter','latex')
+    ylabel('$\omega^2_{eq}(t)$','interpreter','latex')
+end
+
+figure('color',[1 1 1]);
+for i=1:ndof
+    subplot(ndof,1,i); 
+    hold on
+    plot(time, beta_eq(i,:),'linewidth',2)
+    xlabel('Time','interpreter','latex')
+    ylabel('$\beta_{eq}(t)$','interpreter','latex')
+end
+
+%% Get c(t) by solving the ODE from stochastic averaging.
+disp("Solving the ODE to find c(t):")
 
 ic = 0.00000001;
-c_stored = zeros(ndof, numel(time));
-
+c = zeros(ndof, numel(time));
 for i=1:ndof
     beta_eq_dof = beta_eq(i,:);
     omega_eq_2_dof = omega_eq_2(i,:);
@@ -74,76 +127,87 @@ for i=1:ndof
     beta_eq_dof(1) = beta_eq_dof(2);
     omega_eq_2_dof(1) = omega_eq_2_dof(2);
 
-    [t, c_stored(i,:)] = ode45(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, S0, b0, time), tspan, ic);
+    [t, c(i,:)] = ode45(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time), time, ic);
 end
 
-%% mcs
-disp('mcs')
-ns = 16;
-tic
-[var_x, time_out, first_passage_time] = displacement_variance_mcs_mdof(ex, alpha, S0, b0, time, ns, M, C, K, stiffness, ndof, barrier, is_base, fmax_ps);
-toc
+%% =====
 
-str = sprintf('data/var_displacements_ndof_%d_alpha_%.2f_barrier_%.2f_mcs_%d.mat', ndof, alpha, barrier, ns);
-save(str, 'var_x')
-str = sprintf('data/time_out_ndof_%d_alpha_%.2f_barrier_%.2f_mcs_%d.mat', ndof, alpha, barrier, ns);
-save(str, 'time_out')
-str = sprintf('data/first_passage_time_%d_alpha_%.2f_barrier_%.2f_mcs_%d.mat', ndof, alpha, barrier, ns);
-save(str, 'first_passage_time')
+for i=1:ndof
 
-%% plot displacements
-fig = figure('color',[1 1 1]);
+    for j=1:numel(time)
+        t=time(j);
+        sig2t = c(i,j);
+        Sw = @(x)( evolutionary_power_spectrum(x, t) );
+        Sx = @(x,y)( Sw(x)./( (omega_eq_2(i,j) - x.^2).^2 + (y*x).^2 )  );
+        sfun = @(y) ( (sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
+
+        bt = fminbnd(sfun,0.01,500);
+        beq(i,j)=bt;
+
+    end
+    beq(i,1) = beq(i,2);
+
+end
+
+beta_eq = beq;
+
+ic = 0.00000001;
+c = zeros(ndof, numel(time));
+for i=1:ndof
+    beta_eq_dof = beta_eq(i,:);
+    omega_eq_2_dof = omega_eq_2(i,:);
+
+    beta_eq_dof(1) = beta_eq_dof(2);
+    omega_eq_2_dof(1) = omega_eq_2_dof(2);
+
+    [t, c(i,:)] = ode45(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time), time, ic);
+end
+
+
+%%
+figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
-    plot(time, c(i,:)','k-','linewidth',2) % SL
-    plot(time, c_stored(i,:)','r--','linewidth',2) % ODE
-    plot(time_out,var_x(i,:),'b:','linewidth',2) % MCS
+    plot(time, varx_sl(i,:),'k-','linewidth',2) % SL
+    plot(time, c(i,:)','r--','linewidth',2) % ODE
+    if run_mcs
+        plot(time_out,varx_mcs(i,:),'b:','linewidth',2) % MCS
+    end
     legend('SL', 'SA', 'MCS','interpreter','latex')
-    xlabel('Time')
-    ylabel('Displacement Variance')
+    xlabel('Time','interpreter','latex')
+    ylabel('$Var[x(t)]$','interpreter','latex')
 end
 
-str = sprintf('plots/var_displacements_ndof_%d_alpha_%.2f_barrier_%.2f_mcs_%d.pdf', ndof, alpha, barrier, ns);
-saveas(fig,str)
+%% Survival Probability
 
-%% plot
-figure(2)
-plot(time,c,time,var_displacement)
-title("Oscillator non-stationary response variance E[x^2] = c(t)")
-xlabel('Time')
-ylabel('Displacement Variance')
+run_fps = input('Find the Survival Probability (Yes=1, No=0):');
 
-figure(3)
-plot(t,sqrt(omega_eq_2))
-title("\omega_{eq}(t)")
-xlabel('Time')
-ylabel('Natural frequency equivalent')
+if run_fps
 
-figure(4)
-plot(t,beta_eq)
-title("\beta_{eq}(t)")
-xlabel('Time')
-ylabel('Damping equivalent')
+    P=survival_probability(barrier,c,time,30,beta_eq,5);
 
-%% survival probability
-disp("sp")
-[Pb, time_domain] = survival_probability(ndof, barrier, c, beta_eq, omega_eq_2, time, t);
+    
+    figure('color',[1 1 1]);
+    for i=1:ndof
+        fpt = first_passage_time(:,i);
+        fpt = fpt(fpt>0);
+        [fpp,tfp]=ksdensity(fpt,'width',0.001,'Function','survivor');
+        subplot(ndof,1,i); 
+        hold on
+        scatter(fpt,linspace(0,1,numel(fpt)),10,'r','filled','MarkerFaceAlpha',0.2);
+        plot(time, P(i,:)','k','linewidth',2);
+        plot(tfp, fpp,'b--','linewidth',2);
+        
+        legend('MCS','Analytical','KDE','interpreter','latex')
+        title('First passage time')
+        xlabel('Time')
+        ylabel('Survivor Propability')
+        xlim([0 T])
+        ylim([0 1])
+    end
 
-%% plot pb
-fig = figure(5);
-for i=1:ndof
-    [fpp,tfp]=ksdensity(first_passage_time(:,i),'Function','survivor');
-    subplot(ndof,1,i); 
-    hold on
-    plot(time_domain, Pb(i,:)');
-    plot(tfp, fpp);
-    legend('Analytical', 'Approximation','interpreter','latex')
-    title('First passage time')
-    xlabel('Time')
-    ylabel('Survivor Propability')
-    xlim([0, T])
 end
+%%
 
-str = sprintf('plots/first_passage_time_pdf_ndof_%d_alpha_%.2f_barrier_%.2f_mcs_%d.pdf', ndof, alpha, barrier, ns);
-saveas(fig,str)
+

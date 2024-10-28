@@ -1,10 +1,12 @@
-function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] = statistical_linearization(m, c, k, M, C, K, freq, time, ndof, S0, b0, ex, ev, alpha)
+function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
+    statistical_linearization(m, c, k, M, C, K, freq,...
+    time, ndof, epx, q, is_base)
+
     Mt = M;
     tol = 1e-6;
     maxiter = 30;
     ntime = numel(time);
     nfreq = numel(freq);
-    q = alpha;
 
     var_displacement = zeros(ndof,ntime);
     var_velocity = zeros(ndof,ntime);
@@ -13,7 +15,11 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] = statisti
     keq = zeros(ndof, 1);
     ceq = zeros(ndof, 1);
 
-    M_ps = m'*m;
+    if is_base
+        M_ps = m'*m;
+    else
+        M_ps = diag(m);
+    end
 
     for i=1:ntime %loop in time
         t = time(i);
@@ -39,9 +45,10 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] = statisti
                 f = freq(j);
                 H = get_H(f,Mt,Ct,Kt, q);
                 
-                ps = evolutionary_power_spectrum(f, t, S0, b0);
+                ps = evolutionary_power_spectrum(f, t);
 
-                result = H*ps*M_ps*H';
+                E_ps = ps*M_ps;
+                result = real(H*E_ps*H');
 
                 H_ps(:, j) = diag(result);
                 H_ps_freq(:, j) = (f.^2)*diag(result);
@@ -56,13 +63,14 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] = statisti
             keq = zeros(ndof, 1);
          
             for l=1:ndof
-                Ex = trapz(freq, H_ps(l,:));
-                Exd = trapz(freq, H_ps_freq(l,:));
+
+                Ex = 2*trapz(freq, H_ps(l,:));% double sided
+                Exd = 2*trapz(freq, H_ps_freq(l,:));%double sided
              
                 sx2(l) = Ex;
                 sv2(l) = Exd;
-                ceq(l) = 3*ev(l)*c(l)*Exd;
-                keq(l) = 3*ex(l)*k(l)*Ex;
+                ceq(l) = 3*0*c(l)*Exd;
+                keq(l) = 3*epx(l)*k(l)*Ex;
  
             end
             
@@ -85,3 +93,21 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] = statisti
         k_eq_time(:,i) = real(keq);
         c_eq_time(:,i) = real(ceq);
     end
+
+end
+
+function H = get_H(freq, Mt, Ct, Kt, q)
+    H = inv(-(freq.^2) * Mt + (1j * freq)^q * Ct + Kt);
+end
+
+function [Ceq, Keq]=get_equivalent_ck(ceq, keq, ndof)
+    Ceq = zeros(ndof, ndof);
+    Keq = zeros(ndof, ndof);
+
+    for i=1:ndof
+        Ceq(i, i) = ceq(i);
+        Keq(i, i) = keq(i);
+    end
+
+end
+

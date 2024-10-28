@@ -1,6 +1,9 @@
 function [tt,response_frac] = fde45_mdof(fun,tspan,x0,q)
-    N = 30000;
-    tt = linspace(tspan(1), tspan(end), N)';
+    %N = 10000;
+    %tt = linspace(tspan(1), tspan(end), N)';
+
+    tt = tspan;
+    N = numel(tspan);
     n = numel(x0);
     ndof =  round(n / 3);
     nq = numel(q);
