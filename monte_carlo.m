@@ -1,6 +1,5 @@
-function [vx,time_out,first_passage_time,state,amplitude] = ...
-    monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,nonstat,...
-    is_base, T, dT, bar) 
+function [vx,time_out,first_passage_time,state,amplitude] = monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,nonstat, ...
+                                                                        is_base, T, dT, bar) 
 
     Mi = inv(M);
     MiC = Mi*C;
@@ -38,13 +37,11 @@ function [vx,time_out,first_passage_time,state,amplitude] = ...
                 mass,damping,stiffness,epx,is_base,w,tt), tt, xini, q);
         end
 
-        
         for j=1:ndof
             xint = interp1(t1,X(j, :),time_out,'pchip'); %just the displacement
             state(j, :, i) = xint;
             amplitude(j,:,i) = get_amplitude(xint);
         end
-
     end
 
     [~, n_time, ~] = size(state); % z time dimension.
@@ -57,15 +54,12 @@ function [vx,time_out,first_passage_time,state,amplitude] = ...
 
     vx = vx';
 
-
-    %% ==========================
-    % First passage time
+    %% First passage time
 
     first_passage_time = zeros(ns,ndof);
     for i=1:ns
-        
         for j=1:ndof
-            barrier = bar(j);
+            barrier = bar;
             % sample_path = state(i,j,:);
             sample_path = state(j,:,i);
             %sample_path = amplitude(j,:,i);
@@ -79,13 +73,10 @@ function [vx,time_out,first_passage_time,state,amplitude] = ...
                 first_passage_time(i,j) = time_aux(1);
             end
         end
-
     end
-        
 end
 
 function amp = get_amplitude(x)
-
     [r,c] = size(x);
 
     if r>c
@@ -102,6 +93,5 @@ function amp = get_amplitude(x)
   
     A = abs(hilbert(X));
     amp = A(npadd+1:end-npadd);
-
 end
 

@@ -23,16 +23,16 @@ epx = 0.0*ones(1,ndof);
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
 damping = 10*ones(1,ndof);
-stiffness = 100*ones(1,ndof);
+stiffness = 200*ones(1,ndof);
 
 % Maximum time:
-T = 5;
+T = 10;
 
 % Barrier:
-barrier = 0.01;
+barrier = 0.1;
 
 % Time increment for the Monte Carlo simulation.
-dT = 0.01; %dT = 0.0001;
+dT = 0.001; %dT = 0.0001;
 
 % Construct matrices M, C, and K:
 [M, C, K] = get_mck(mass, damping, stiffness, ndof);
@@ -48,16 +48,12 @@ ntime = 100;
 nfreq = 1000;
 
 %% Monte Carlo Simulation
-
 run_mcs = input('Run Monte Carlo Simulation (Yes=1, No=0):');
 
 if run_mcs
     disp('Running MCS:')
-    
-    [varx_mcs, time_out, first_passage_time] = ...
-        monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,...
-        nonstat, is_base,T,dT, barrier);
-
+    [varx_mcs, time_out, first_passage_time] = monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness, ...
+                                                           fmax_ps, nonstat, is_base, T, dT, barrier);
 end
 
 %% Statistical Linearization
@@ -67,17 +63,14 @@ time = linspace(0, T, ntime);
 omega_n = sqrt(eig(inv(M)*K));
 freq = linspace(0,fmax_ps,nfreq);
 
-[varx_sl, varv_sl, conv, k_eq, c_eq] = ...
-    statistical_linearization(mass, damping, stiffness, M, C, K,...
-    freq, time, ndof, epx, q, is_base);
+[varx_sl, varv_sl, conv, k_eq, c_eq] = statistical_linearization(mass, damping, stiffness, M, C, K,...
+                                                                 freq, time, ndof, epx, q, is_base);
 
 %% Equivalent damping and stiffness
-
 omega_eq_2 = varv_sl./varx_sl;
 omega_eq_2(:,1) = omega_eq_2(:,2);
 
 for i=1:ndof
-
     for j=1:numel(time)
         t=time(j);
         sig2t = varx_sl(i,j);
@@ -87,16 +80,12 @@ for i=1:ndof
 
         bt = fminbnd(sfun,0.01,500);
         beq(i,j)=bt;
-
     end
     beq(i,1) = beq(i,2);
-
 end
 
 beta_eq = beq;
-
-
-%%
+%% plot figures
 figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
@@ -127,13 +116,12 @@ for i=1:ndof
     beta_eq_dof(1) = beta_eq_dof(2);
     omega_eq_2_dof(1) = omega_eq_2_dof(2);
 
-    [t, c(i,:)] = ode45(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time), time, ic);
+    [t, c(i,:)] = ode45(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time, q), time, ic);
 end
 
 %% =====
 
 for i=1:ndof
-
     for j=1:numel(time)
         t=time(j);
         sig2t = c(i,j);
@@ -143,26 +131,12 @@ for i=1:ndof
 
         bt = fminbnd(sfun,0.01,500);
         beq(i,j)=bt;
-
     end
-    beq(i,1) = beq(i,2);
 
+    beq(i,1) = beq(i,2);
 end
 
 beta_eq = beq;
-
-ic = 0.00000001;
-c = zeros(ndof, numel(time));
-for i=1:ndof
-    beta_eq_dof = beta_eq(i,:);
-    omega_eq_2_dof = omega_eq_2(i,:);
-
-    beta_eq_dof(1) = beta_eq_dof(2);
-    omega_eq_2_dof(1) = omega_eq_2_dof(2);
-
-    [t, c(i,:)] = ode45(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time), time, ic);
-end
-
 
 %%
 figure('color',[1 1 1]);
@@ -184,10 +158,8 @@ end
 run_fps = input('Find the Survival Probability (Yes=1, No=0):');
 
 if run_fps
-
     P=survival_probability(barrier,c,time,30,beta_eq,5);
 
-    
     figure('color',[1 1 1]);
     for i=1:ndof
         fpt = first_passage_time(:,i);
@@ -206,8 +178,4 @@ if run_fps
         xlim([0 T])
         ylim([0 1])
     end
-
 end
-%%
-
-
