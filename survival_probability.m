@@ -16,7 +16,7 @@ function P=survival_probability(bar,c,time,num_time,beta_eq,N)
     for dof=1:ndof
         time_domain = linspace(time(1),time(end),num_time);
         
-        barrier = bar;
+        barrier = bar(dof);
         c_dof = c(dof,:);
         beta_eq_dof = beta_eq(dof,:);
     
