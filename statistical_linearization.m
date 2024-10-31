@@ -1,6 +1,5 @@
 function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
-    statistical_linearization(m, c, k, M, C, K, freq,...
-    time, ndof, epx, q, is_base)
+    statistical_linearization(m, c, k, M, C, K, freq, time, ndof, epx, q, is_base, oscillator, gamma_bw, beta_bw, A_bw)
 
     Mt = M;
     tol = 1e-6;
@@ -66,12 +65,20 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
 
                 Ex = 2*trapz(freq, H_ps(l,:));% double sided
                 Exd = 2*trapz(freq, H_ps_freq(l,:));%double sided
-             
+
                 sx2(l) = Ex;
                 sv2(l) = Exd;
-                ceq(l) = 3*0*c(l)*Exd;
-                keq(l) = 3*epx(l)*k(l)*Ex;
- 
+
+                if (oscillator == 'duffing')
+                    ceq(l) = 3*0*c(l)*Exd;
+                    keq(l) = 3*epx(l)*k(l)*Ex;
+                elseif (oscillator == 'bw')
+                    Ez = 2*trapz(freq, H_ps(i+ndof,:));
+                    Ezd = -(keq(l) / ceq(l)) * Ez;
+
+                    ceq(l) = (sqrt(2/pi)*(gamma_bw * Ezd / sqrt(Exd) + beta_bw * sqrt(Ez)) - A_bw);
+                    keq(l) = (sqrt(2/pi)*(gamma_bw * sqrt(Exd) + beta_bw * Ezd / sqrt(Ez)));
+                end
             end
             
             [Ceq, Keq] = get_equivalent_ck(ceq, keq, ndof);

@@ -53,6 +53,9 @@ run_mcs = true;
 % Find the Survival Probability (Yes=1, No=0):
 run_fps = true;
 
+%Oscillator type ('bw', 'duffing')
+oscillator = 'bw';
+
 %% Statistical Linearization
 disp("Running Statistical Linearization:")
 
@@ -61,8 +64,7 @@ omega_n = sqrt(eig(inv(M)*K));
 freq = linspace(0,fmax_ps,nfreq);
 
 [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
-    statistical_linearization(mass, damping, stiffness, M, C, K,...
-    freq, time, ndof, epx, q, is_base);
+    statistical_linearization(mass, damping, stiffness, M, C, K,freq, time, ndof, epx, q, is_base, oscillator);
 
 for i=1:ndof
     smaxt(i) = max(varx_sl(1,:));
