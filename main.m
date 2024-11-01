@@ -2,16 +2,19 @@
 clc
 clear
 close all
-%%
+
 % For reproducibility:
 rng(1111);
+
+% Oscillator ('bw', 'duffing')
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
 nonstat = true;
 
 % Number of DOFs:
-ndof = 2;
+ndof = 3;
 
 % Fractional derivative:
 q = 0.5; 
@@ -24,6 +27,14 @@ mass = 1*ones(1,ndof);
 damping = 50*ones(1,ndof);
 stiffness = 100*ones(1,ndof);
 
+% Bouc-Wen parameters
+a_bw = 0.15*ones(1, ndof);
+A_bw = 1;
+beta_bw = 0.5;
+gamma_bw = beta_bw;
+n_bw = 1;
+y0_bw = 1;
+
 % Maximum time:
 T = 10;
 
@@ -34,7 +45,11 @@ lam = 1;
 dT = 0.001; %dT = 0.0001;
 
 % Construct matrices M, C, and K:
-[M, C, K] = get_mck(mass, damping, stiffness, ndof);
+if (oscillator == "duffing")
+    [M, C, K] = get_mck(mass, damping, stiffness, ndof);
+elseif (oscillator == "bw")
+    [M, C, K] = get_mck_bw(mass, damping, stiffness, a_bw, ndof, y0_bw);
+end
 
 % Maximum frequency of the power spectrum:
 fmax_ps = 50; 
@@ -56,11 +71,17 @@ run_fps = true;
 disp("Running Statistical Linearization:")
 
 time = linspace(0, T, ntime);
-omega_n = sqrt(eig(inv(M)*K));
-freq = linspace(0,fmax_ps,nfreq);
 
-[varx_sl, varv_sl, conv, k_eq, c_eq] = ...
-    statistical_linearization(mass, damping, stiffness, M, C, K,freq, time, ndof, epx, q, is_base, oscillator);
+if (oscillator == "duffing")
+    omega_n = sqrt(eig(inv(M)*K));
+    freq = linspace(0,fmax_ps,nfreq);
+    
+    [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
+    statistical_linearization(mass, damping, stiffness, M, C, K, freq, time, ndof, epx, q, is_base);
+elseif (oscillator == "bw")
+    [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
+    statistical_linearization_bw(M, C, K, time, A_bw, gamma_bw, beta_bw, fmax_ps, nfreq);
+end
 
 for i=1:ndof
     smaxt(i) = max(varx_sl(1,:));
@@ -68,7 +89,6 @@ end
 
 smaxi = max(smaxt);
 for i=1:ndof
-    
     barrier(i) = lam*sqrt(smaxi);
 end
 
