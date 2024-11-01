@@ -12,7 +12,6 @@ function [vx,time_out,first_passage_time,state,amplitude] = monte_carlo(ns,M,C,K
     end
     
     %MCS
-    %tt = linspace(0, T, 30000);
     tt = 0:dT:T;
     nt = numel(tt);
     
