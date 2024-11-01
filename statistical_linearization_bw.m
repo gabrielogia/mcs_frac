@@ -1,4 +1,4 @@
-function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, K, time, A, gamma1, beta1, fmax_ps, nfreq)
+function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, K, time, A, gamma1, beta1, fmax_ps, nfreq, q)
 
     tol=1e-6;
     maxiter = 30;
@@ -8,7 +8,7 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
     %Ko = K(1:ndof,1:ndof);
     %wn = sqrt(eig(inv(Mo)*Ko));
     
-    freq = linspace(0, fmax_ps, nfreq);
+    freq = linspace(0.1, fmax_ps, nfreq);
     ntime = numel(time);
 
     Mt = M;
@@ -16,10 +16,9 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
     var_x = zeros(ndof,ntime);
     var_v = zeros(ndof,ntime);
     ktime = zeros(ndof,ntime); 
-    ctime = zeros(ndof,ntime); 
-
-    keq = 1+zeros(ndof, 1);
-    ceq = 1+1e-101*ones(ndof, 1);
+    ctime = zeros(ndof,ntime);
+    keq = 200*ones(ndof, 1);
+    ceq = 200*ones(ndof, 1);
 
     % Loop in time
     for ii=1:ntime
@@ -47,7 +46,7 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
             for kk=1:nfreq
                 f = freq(kk);
             
-                H = getH(f,Mt,Ct,Kt);
+                H = get_H(f, Mt, Ct, Kt, q);
                
                 aux = zeros(ndof,1);
                 auz = zeros(ndof,1);
@@ -106,8 +105,8 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
 
 end
 
-function H = getH(freq, Mt, Ct, Kt)
-    H = inv(-(freq.^2) * Mt + 1j * freq * Ct + Kt);
+function H = get_H(freq, Mt, Ct, Kt, q)
+    H = inv(-(freq.^2) * Mt + (1j * freq)^q * Ct + Kt);
 end
 
 function [Meq, Ceq, Keq]=create_matrix_bw(ceq, keq, ndof)
