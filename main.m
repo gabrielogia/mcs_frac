@@ -7,14 +7,14 @@ close all
 rng(1111);
 
 % Oscillator ('bw', 'duffing')
-oscillator = "bw";
+oscillator = "duffing";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
 nonstat = true;
 
 % Number of DOFs:
-ndof = 3;
+ndof = 2;
 
 % Fractional derivative:
 q = 0.5; 
@@ -31,9 +31,9 @@ stiffness = 100*ones(1,ndof);
 a_bw = 0.15*ones(1, ndof);
 A_bw = 1;
 beta_bw = 0.5;
-gamma_bw = beta_bw;
+gamma_bw = 1 - beta_bw;
 n_bw = 1;
-y0_bw = 1;
+y0_bw = 0.00001;
 
 % Maximum time:
 T = 10;
@@ -55,7 +55,7 @@ end
 fmax_ps = 50; 
 
 % Number of samples in the MCS:
-ns = 48;
+ns = 300;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -68,9 +68,9 @@ run_mcs = true;
 run_fps = true;
 
 %% Statistical Linearization
-disp("Running Statistical Linearization:")
+disp(["Running Statistical Linearization:" oscillator])
 
-time = linspace(0, T, ntime);
+time = linspace(1e-3, T, ntime);
 
 if (oscillator == "duffing")
     omega_n = sqrt(eig(inv(M)*K));
@@ -80,7 +80,7 @@ if (oscillator == "duffing")
     statistical_linearization(mass, damping, stiffness, M, C, K, freq, time, ndof, epx, q, is_base);
 elseif (oscillator == "bw")
     [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
-    statistical_linearization_bw(M, C, K, time, A_bw, gamma_bw, beta_bw, fmax_ps, nfreq);
+    statistical_linearization_bw(M, C, K, time, A_bw, gamma_bw, beta_bw, fmax_ps, nfreq, q);
 end
 
 for i=1:ndof
@@ -93,17 +93,19 @@ for i=1:ndof
 end
 
 %% Monte Carlo Simulation
-%run_mcs = input('Run Monte Carlo Simulation (Yes=1, No=0):');
-
 if run_mcs
-    disp('Running MCS:')
+    disp(['Running MCS:' oscillator])
     
-    [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
-        monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps, nonstat, is_base,T,dT, barrier);
+    if (oscillator == "duffing")
+        [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
+            monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps, nonstat, is_base,T,dT, barrier);
+    elseif (oscillator == "bw")
+        [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
+            monte_carlo_bw(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw);
+    end
 end
 
-%%
-
+%% plot sample paths 
 idd=1;
 figure
 cc=1;
@@ -124,7 +126,6 @@ for i=1:ns
     end
 end
 
-
 %% Equivalent damping and stiffness
 omega_eq_2 = varv_sl./varx_sl;
 
@@ -136,9 +137,7 @@ for i=1:ndof
         t=time(j);
         sig2t = varx_sl(i,j);
         Sw = @(x)( evolutionary_power_spectrum(x, t) );
-        %Sx = @(x,y)( Sw(x)./( (omega_eq_2(i,j) - x.^2).^2 + (y*x).^2 )  );
         Sx = @(x,y)( Sw(x)./( abs(omega_eq_2(i,j) - x.^2 + y*(1i*x).^q).^2 )  );
-        %sfun = @(y) ( (sig2t - pi*omega_eq_2(i,j)./( omega_eq_2(i,j)*y ) ).^2  );
 
         sfun = @(y) ( (sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
 
@@ -146,17 +145,13 @@ for i=1:ndof
         beq(i,j)=bt;
 
     end
-    %beq(i,1) = beq(i,2);
     beq(i,1) = findfirstpoint(beq(i,2),beq(i,3));
 
 end
-
 beta_eq = beq;
 
-%beta_eq = beta_eq./(sqrt(omega_eq_2).^(q-1).*sin(q*pi/2));
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
-
 
 ic = 0.00000001;
 c = zeros(ndof, numel(time));
@@ -170,12 +165,10 @@ for i=1:ndof
     [t, c(i,:)] = ode89(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time,q), time, ic);
 end
 
-
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
 
 nitera=0;
-%figure
 cn=1;
 if nitera>0
     c = zeros(ndof, numel(time));
@@ -184,7 +177,6 @@ end
 niterav = 1:ndof;
 for i=1:ndof
     for ii=1:nitera
-
         ic = 0.00000001;
         beta_eq_dof = beta_eq(i,:);
         omega_eq_2_dof = omega_eq_2(i,:);
@@ -205,40 +197,16 @@ for i=1:ndof
     
             bt = fminbnd(sfun,0.000000001,1500);
             beq(i,j)=bt;
-    
         end
 
         beq(i,1) = findfirstpoint(beq(i,2),beq(i,3));
         beta_eq(i,:) = beq(i,:);
     end
 end
-% plot(time,dc','r')
-% hold on
-% drawnow
 
-
-%%
-% j=3;
-% i=1;
-% t=time(j);
-% sig2t = c(i,j);
-% Sw = @(x)( evolutionary_power_spectrum(x, t) );
-% Sx = @(x,y)( Sw(x)./( (omega_eq_2(i,j) - x.^2).^2 + (y*x).^2 )  );
-% sfun = @(y) ( (sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
-% 
-% bt = fminbnd(sfun,0.000000001,1500);
-% beq(i,j)=bt;
-% clear x
-% Y=0.0001:0.01:500;
-% for i=1:numel(Y) 
-%     x(i)=sfun(Y(i));
-% end
-% 
-% close all
-% semilogy(Y,x)
-
-%%
+%% plot omega_eq, beta_eq, and var displacement
 figure('color',[1 1 1]);
+
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
@@ -256,7 +224,6 @@ for i=1:ndof
     ylabel('$\beta_{eq}(t)$','interpreter','latex')
 end
 
-%%
 figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
@@ -272,15 +239,11 @@ for i=1:ndof
 end
 
 %% Survival Probability
-
-%run_fps = input('Find the Survival Probability (Yes=1, No=0):');
-
 if run_fps
     %bt = beta_eq./(sqrt(omega_eq_2).^(q-1).*sin(q*pi/2));
     bt = beta_eq;
     P=survival_probability(barrier,c,time,1000,bt,10);
 
-    
     figure('color',[1 1 1]);
     for i=1:ndof
         fpt = first_passage_time(:,i);
@@ -299,5 +262,4 @@ if run_fps
         xlim([0 T])
         ylim([0 1])
     end
-
 end
