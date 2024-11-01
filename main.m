@@ -2,7 +2,6 @@
 clc
 clear
 close all
-
 %%
 % For reproducibility:
 rng(1111);
@@ -53,9 +52,6 @@ run_mcs = true;
 % Find the Survival Probability (Yes=1, No=0):
 run_fps = true;
 
-%Oscillator type ('bw', 'duffing')
-oscillator = 'bw';
-
 %% Statistical Linearization
 disp("Running Statistical Linearization:")
 
@@ -77,16 +73,13 @@ for i=1:ndof
 end
 
 %% Monte Carlo Simulation
-
 %run_mcs = input('Run Monte Carlo Simulation (Yes=1, No=0):');
 
 if run_mcs
     disp('Running MCS:')
     
     [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
-        monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,...
-        nonstat, is_base,T,dT, barrier);
-
+        monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps, nonstat, is_base,T,dT, barrier);
 end
 
 %%
@@ -109,13 +102,10 @@ for i=1:ns
     tf(cc)=xx(end);
     cc=cc+1;
     end
-    
-
 end
 
 
 %% Equivalent damping and stiffness
-
 omega_eq_2 = varv_sl./varx_sl;
 
 for i=1:ndof
@@ -171,7 +161,6 @@ if nitera>0
     c = zeros(ndof, numel(time));
 end
 
-
 niterav = 1:ndof;
 for i=1:ndof
     for ii=1:nitera
@@ -200,10 +189,7 @@ for i=1:ndof
         end
 
         beq(i,1) = findfirstpoint(beq(i,2),beq(i,3));
-        
         beta_eq(i,:) = beq(i,:);
-    
-    
     end
 end
 % plot(time,dc','r')
@@ -295,6 +281,3 @@ if run_fps
     end
 
 end
-%%
-
-
