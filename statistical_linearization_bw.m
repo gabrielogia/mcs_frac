@@ -4,9 +4,6 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
     maxiter = 30;
 
     ndof = numel(M(:,1))/2;
-    %Mo = M(1:ndof,1:ndof);
-    %Ko = K(1:ndof,1:ndof);
-    %wn = sqrt(eig(inv(Mo)*Ko));
     
     freq = linspace(0.1, fmax_ps, nfreq);
     ntime = numel(time);
@@ -19,7 +16,6 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
     ctime = zeros(ndof,ntime);
     keq = zeros(ndof, 1);
     ceq = 0.000001*ones(ndof, 1);
-
 
     % Loop in time
     for ii=1:ntime
@@ -49,13 +45,6 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
                 f = freq(kk);
             
                 H = get_H(f, Mt, Ct, Kt, q);
-                %ps = evolutionary_power_spectrum(f, t);
-                %S = 2*ps*eye(ndof);
-
-                %result = real(H*S*H');
-      
-                %H_ps(:, kk) = diag(result);
-                %H_ps_freq(:, kk) = (f.^2)*diag(result);
                
                 aux = zeros(ndof,1);
                 auz = zeros(ndof,1);
@@ -66,7 +55,6 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
                     aux = aux + (2*ps*abs(H(1:ndof, jj)).^2);
                     auz = auz + (2*ps*abs(H(1+ndof:2*ndof, jj)).^2);
                 end
-
 
                 H_ps(1:ndof, kk) = aux;
                 H_ps_freq(1:ndof, kk) = (f.^2)*aux;
@@ -79,12 +67,6 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
     
             sx2 = zeros(ndof, 1);
             sv2 = zeros(ndof, 1);
-
-            
-            % plot(freq, H_ps(1,:))
-            % drawnow
-            % hold on
-            % pause
         
             for i=1:ndof
                 Ex = trapz(freq, H_ps(i,:));

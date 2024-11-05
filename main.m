@@ -7,7 +7,7 @@ close all
 rng(1111);
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -24,16 +24,19 @@ epx = 0.2*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
-damping = 50*ones(1,ndof);
 stiffness = 100*ones(1,ndof);
+damping = 50*ones(1,ndof);
 
 % Bouc-Wen parameters
-a_bw = 0.15*ones(1, ndof);
+a_bw = 0.5*ones(1, ndof);
 A_bw = 1;
 beta_bw = 0.5;
-gamma_bw = 1 - beta_bw;
+gamma_bw = 0.5;
 n_bw = 1;
-y0_bw = 0.00001;
+y0_bw = 1;
+
+% Yielding displacement.
+xy=0.1;
 
 % Maximum time:
 T = 10;
@@ -42,7 +45,7 @@ T = 10;
 lam = 1;
 
 % Time increment for the Monte Carlo simulation.
-dT = 0.001; %dT = 0.0001;
+dT = 0.0001; %dT = 0.0001;
 
 % Construct matrices M, C, and K:
 if (oscillator == "duffing")
@@ -52,10 +55,10 @@ elseif (oscillator == "bw")
 end
 
 % Maximum frequency of the power spectrum:
-fmax_ps = 50; 
+fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 300;
+ns = 50;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -80,7 +83,7 @@ if (oscillator == "duffing")
     statistical_linearization(mass, damping, stiffness, M, C, K, freq, time, ndof, epx, q, is_base);
 elseif (oscillator == "bw")
     [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
-    statistical_linearization_bw(M, C, K, time, A_bw, gamma_bw, beta_bw, fmax_ps, nfreq, q);
+    statistical_linearization_bw(M, C, K, time, A_bw, gamma_bw, beta_bw, fmax_ps, nfreq, q, xy);
 end
 
 for i=1:ndof
@@ -101,7 +104,7 @@ if run_mcs
             monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps, nonstat, is_base,T,dT, barrier);
     elseif (oscillator == "bw")
         [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
-            monte_carlo_bw(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw);
+            monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw, xy);
     end
 end
 
