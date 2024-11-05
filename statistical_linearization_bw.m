@@ -1,4 +1,4 @@
-function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, K, time, A, gamma1, beta1, fmax_ps, nfreq, q)
+function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, K, time, A, gamma1, beta1, fmax_ps, nfreq, q,xy)
 
     tol=1e-6;
     maxiter = 30;
@@ -17,8 +17,9 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
     var_v = zeros(ndof,ntime);
     ktime = zeros(ndof,ntime); 
     ctime = zeros(ndof,ntime);
-    keq = 200*ones(ndof, 1);
-    ceq = 200*ones(ndof, 1);
+    keq = zeros(ndof, 1);
+    ceq = 0.000001*ones(ndof, 1);
+
 
     % Loop in time
     for ii=1:ntime
@@ -40,6 +41,7 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
             Ct = C + Ceq;
             Kt = K + Keq;
     
+    
             H_ps = zeros(2*ndof, nfreq);
             H_ps_freq = zeros(2*ndof, nfreq);
           
@@ -47,17 +49,25 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
                 f = freq(kk);
             
                 H = get_H(f, Mt, Ct, Kt, q);
+                %ps = evolutionary_power_spectrum(f, t);
+                %S = 2*ps*eye(ndof);
+
+                %result = real(H*S*H');
+      
+                %H_ps(:, kk) = diag(result);
+                %H_ps_freq(:, kk) = (f.^2)*diag(result);
                
                 aux = zeros(ndof,1);
                 auz = zeros(ndof,1);
 
                 for jj = 1:ndof
                     ps = evolutionary_power_spectrum(f, t);
-         
+
                     aux = aux + (2*ps*abs(H(1:ndof, jj)).^2);
                     auz = auz + (2*ps*abs(H(1+ndof:2*ndof, jj)).^2);
                 end
-                
+
+
                 H_ps(1:ndof, kk) = aux;
                 H_ps_freq(1:ndof, kk) = (f.^2)*aux;
                 H_ps(ndof+1:2*ndof,kk) = auz;
@@ -69,15 +79,21 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
     
             sx2 = zeros(ndof, 1);
             sv2 = zeros(ndof, 1);
-           
+
+            
+            % plot(freq, H_ps(1,:))
+            % drawnow
+            % hold on
+            % pause
+        
             for i=1:ndof
                 Ex = trapz(freq, H_ps(i,:));
                 Exd = trapz(freq, H_ps_freq(i,:));
                 Ez = trapz(freq, H_ps(i + ndof, :));
                 Ezd = -(keq(i) / ceq(i)) * Ez;
            
-                ceq(i) = (sqrt(2/pi)*(gamma1 * Ezd / sqrt(Exd) + beta1 * sqrt(Ez)) - A);
-                keq(i) = (sqrt(2/pi)*(gamma1 * sqrt(Exd) + beta1 * Ezd / sqrt(Ez)));
+                ceq(i) = (sqrt(2/pi)*(gamma1 * Ezd / sqrt(Exd) + beta1 * sqrt(Ez)) - A)/xy;
+                keq(i) = (sqrt(2/pi)*(gamma1 * sqrt(Exd) + beta1 * Ezd / sqrt(Ez)))/xy;
 
                 sx2(i) = Ex;
                 sv2(i) = Exd;
@@ -95,6 +111,7 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
             dkeq_max = max(dkeq);
             
             itera = itera + 1;
+         
         end
         
         var_x(:,ii) = sx2;
