@@ -54,8 +54,8 @@ function [vx,time_out,first_passage_time,state,amplitude] = monte_carlo(ns,M,C,K
     vx = vx';
 
     %% First passage time
-
     first_passage_time = zeros(ns,ndof);
+
     for i=1:ns
         for j=1:ndof
             barrier = bar(j);
@@ -83,7 +83,6 @@ function amp = get_amplitude(x)
     end
 
     npadd = ceil(max(r,c)/5);
-    % X = padarray(x',npadd,'circ')';
     X = padarray(x',npadd,'symmetric')';
 
     if r>c
