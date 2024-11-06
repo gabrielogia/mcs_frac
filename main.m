@@ -1,7 +1,9 @@
-%% structure data
+%% main.m
 clc
 clear
 close all
+
+%% Structure data
 
 % For reproducibility:
 rng(1111);
@@ -58,7 +60,7 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 50;
+ns = 5000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -69,6 +71,13 @@ run_mcs = true;
 
 % Find the Survival Probability (Yes=1, No=0):
 run_fps = true;
+
+% Base string to save files
+str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d', oscillator, ndof, q, max(epx), dT, ns);
+
+if (oscillator == "bw")
+    str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
+end
 
 %% Statistical Linearization
 disp(["Running Statistical Linearization:" oscillator])
@@ -110,24 +119,30 @@ end
 
 %% plot sample paths 
 idd=1;
-figure
+fig = figure;
 cc=1;
 for i=1:ns
     z = amplitude(idd,:,i);
     %z = response(idd,:,i);
     B = barrier(idd);
     tb=time_out(abs(z)>B);
+
     if ~isempty(tb)
-    xx=time_out;
-    z(time_out>tb(1))=[];
-    xx(time_out>tb(1))=[];
-    hold on
-    plot(xx,z,'k')
-    plot(xx(end),B,'r.')
-    tf(cc)=xx(end);
-    cc=cc+1;
+        xx=time_out;
+        z(time_out>tb(1))=[];
+        xx(time_out>tb(1))=[];
+        hold on
+        plot(xx,z,'k')
+        plot(xx(end),B,'r.')
+        tf(cc)=xx(end);
+        cc=cc+1;
+        title('Sample paths amplitude crossing the barrier', 'Interpreter', 'latex', 'FontSize', 16)
+        xlabel('Time', 'Interpreter', 'latex', 'FontSize', 14)
+        ylabel('Amplitude', 'Interpreter', 'latex', 'FontSize', 14)
     end
 end
+
+saveas(fig, strcat('plots/samplepaths_', str, '.pdf'))
 
 %% Equivalent damping and stiffness
 omega_eq_2 = varv_sl./varx_sl;
@@ -208,26 +223,31 @@ for i=1:ndof
 end
 
 %% plot omega_eq, beta_eq, and var displacement
-figure('color',[1 1 1]);
-
+fig = figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
     plot(time,omega_eq_2(i,:),'linewidth',2) % MCS
-    xlabel('Time','interpreter','latex')
-    ylabel('$\omega^2_{eq}(t)$','interpreter','latex')
+    xlabel('Time','interpreter','latex', 'FontSize', 14)
+    ylabel('$\omega^2_{eq}(t)$','interpreter','latex', 'FontSize', 14)
+    title('Oscillator equivalent natural frequency', 'Interpreter', 'latex', 'FontSize', 16)
 end
 
-figure('color',[1 1 1]);
+saveas(fig, strcat('plots/omegaeq_', str, '.pdf'))
+
+fig = figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
     plot(time, beta_eq(i,:),'linewidth',2)
-    xlabel('Time','interpreter','latex')
-    ylabel('$\beta_{eq}(t)$','interpreter','latex')
+    xlabel('Time','interpreter','latex', 'FontSize', 14)
+    ylabel('$\beta_{eq}(t)$','interpreter','latex', 'FontSize', 14)
+    title('Oscillator equivalent damping', 'Interpreter', 'latex', 'FontSize', 16)
 end
 
-figure('color',[1 1 1]);
+saveas(fig, strcat('plots/betaeq_', str, '.pdf'))
+
+fig = figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
@@ -236,18 +256,20 @@ for i=1:ndof
     if run_mcs
         plot(time_out,varx_mcs(i,:),'b:','linewidth',2) % MCS
     end
-    legend('SL', 'SA', 'MCS','interpreter','latex')
-    xlabel('Time','interpreter','latex')
-    ylabel('$Var[x(t)]$','interpreter','latex')
+    legend('SL', 'SA', 'MCS','interpreter','latex', 'FontSize', 10)
+    xlabel('Time','interpreter','latex', 'FontSize', 14)
+    ylabel('$Var[x(t)]$','interpreter','latex', 'FontSize', 14)
+    title('Oscillator displacement variance', 'Interpreter', 'latex', 'FontSize', 16)
 end
+
+saveas(fig, strcat('plots/displacement_variance_', str, '.pdf'))
 
 %% Survival Probability
 if run_fps
-    %bt = beta_eq./(sqrt(omega_eq_2).^(q-1).*sin(q*pi/2));
     bt = beta_eq;
     P=survival_probability(barrier,c,time,1000,bt,10);
 
-    figure('color',[1 1 1]);
+    fig = figure('color',[1 1 1]);
     for i=1:ndof
         fpt = first_passage_time(:,i);
         fpt = fpt(fpt>0);
@@ -258,11 +280,13 @@ if run_fps
         plot(time, P(i,:)','k','linewidth',2);
         plot(tfp, fpp,'b--','linewidth',2);
         
-        legend('MCS','Analytical','KDE','interpreter','latex')
-        title('First passage time')
-        xlabel('Time')
-        ylabel('Survivor Propability')
+        legend('MCS','Analytical','KDE','interpreter','latex','FontSize', 10)
+        title('First passage time', 'Interpreter', 'latex', 'FontSize', 16)
+        xlabel('Time', 'interpreter','latex', 'FontSize', 14)
+        ylabel('Survivor Propability', 'interpreter','latex', 'FontSize', 14)
         xlim([0 T])
         ylim([0 1])
     end
 end
+
+saveas(fig, strcat('plots/firsttimepassage_', str, '.pdf'))
