@@ -7,7 +7,7 @@ close all
 rng(1111);
 
 % Oscillator ('bw', 'duffing')
-oscillator = "bw";
+oscillator = "duffing";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -45,7 +45,7 @@ T = 10;
 lam = 1;
 
 % Time increment for the Monte Carlo simulation.
-dT = 0.0001; %dT = 0.0001;
+dT = 0.001; %dT = 0.0001;
 
 % Construct matrices M, C, and K:
 if (oscillator == "duffing")
