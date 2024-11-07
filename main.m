@@ -4,6 +4,7 @@ clear
 close all
 
 %% Structure data
+tic
 
 % For reproducibility:
 rng(1111);
@@ -19,7 +20,7 @@ nonstat = true;
 ndof = 2;
 
 % Fractional derivative:
-q = 0.5; 
+q = 0.25; 
 
 % Nonlinearity parameter:
 epx = 0.2*ones(1,ndof);
@@ -60,7 +61,7 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 5000;
+ns = 10000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -290,3 +291,5 @@ if run_fps
 end
 
 saveas(fig, strcat('plots/firsttimepassage_', str, '.pdf'))
+
+toc
