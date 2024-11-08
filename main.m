@@ -20,7 +20,7 @@ nonstat = true;
 ndof = 2;
 
 % Fractional derivative:
-q = 0.40; 
+q = 0.60; 
 
 % Nonlinearity parameter:
 epx = 0.2*ones(1,ndof);
