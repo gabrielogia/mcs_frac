@@ -20,7 +20,7 @@ nonstat = true;
 ndof = 2;
 
 % Fractional derivative:
-q = 0.60; 
+q = 0.5; 
 
 % Nonlinearity parameter:
 epx = 0.2*ones(1,ndof);
@@ -58,10 +58,10 @@ elseif (oscillator == "bw")
 end
 
 % Maximum frequency of the power spectrum:
-fmax_ps = 150; 
+fmax_ps = 50; %(bw: 150); 
 
 % Number of samples in the MCS:
-ns = 10000;
+ns = 480;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
