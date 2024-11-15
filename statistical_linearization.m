@@ -1,5 +1,6 @@
 function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
-    statistical_linearization(m, c, k, M, C, K, freq, time, ndof, epx, q, is_base)
+    statistical_linearization(m, c, k, M, C, K, freq,...
+    time, ndof, epx, q, is_base)
 
     Mt = M;
     tol = 1e-6;
@@ -65,11 +66,12 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
 
                 Ex = 2*trapz(freq, H_ps(l,:));% double sided
                 Exd = 2*trapz(freq, H_ps_freq(l,:));%double sided
-
+             
                 sx2(l) = Ex;
                 sv2(l) = Exd;
                 ceq(l) = 3*0*c(l)*Exd;
                 keq(l) = 3*epx(l)*k(l)*Ex;
+ 
             end
             
             [Ceq, Keq] = get_equivalent_ck(ceq, keq, ndof);

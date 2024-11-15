@@ -4,7 +4,7 @@ clear
 close all
 
 %% Structure data
-tic
+tic 
 
 % For reproducibility:
 rng(1111);
@@ -20,14 +20,14 @@ nonstat = true;
 ndof = 3;
 
 % Fractional derivative:
-q = 0.50; 
+q = 0.5; 
 
 % Nonlinearity parameter:
 epx = 0.2*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
-damping = 20*ones(1,ndof);
+damping = 5*ones(1,ndof);
 stiffness = 50*ones(1,ndof);
 
 % Bouc-Wen parameters
@@ -42,7 +42,7 @@ y0_bw = 1;
 xy=0.1;
 
 % Maximum time:
-T = 10;
+T = 20;
 
 % Barrier:
 lam = 0.7;
@@ -58,14 +58,14 @@ elseif (oscillator == "bw")
 end
 
 % Maximum frequency of the power spectrum:
-fmax_ps = 50; %(bw: 150); 
+fmax_ps = 50; 
 
 % Number of samples in the MCS:
-ns = 200;
+ns = 100;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
-nfreq = 1000;
+nfreq = 500;
 
 % Run MCS:
 run_mcs = true;
@@ -148,18 +148,19 @@ end
 
 %% Monte Carlo Simulation
 if run_mcs
-    disp(['Running MCS:' oscillator])
+    disp('Running MCS:')
     
     if (oscillator == "duffing")
-        [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
-            monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps, nonstat, is_base,T,dT, barrier);
+    [varx_mcs, time_out, first_passage_time,response,velocity,amplitude] = ...
+        monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,...
+        nonstat, is_base,T,dT, barrier);
     elseif (oscillator == "bw")
         [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
             monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw, xy);
     end
 end
 
-%% 
+%%
 [first_passage_time,amplitude] = time_failure(response,velocity,barrier,omega_eq_2,time_out,time);
 
 am = shiftdim(amplitude,1);
@@ -241,24 +242,25 @@ saveas(fig, strcat('plots/displacement_variance_', str, '.pdf'))
 
 %% Survival Probability
 if run_fps
-    bt = beta_eq;
-    P=survival_probability(barrier,c,time,1000,bt,10);
 
-    fig = figure('color',[1 1 1]);
+    bt = beta_eq;
+    P=survival_probability_3(barrier,c,time,10,bt,omega_eq_2,stiffness,12);
+
+    figure('color',[1 1 1]);
     for i=1:ndof
         fpt = first_passage_time(:,i);
         fpt = fpt(fpt>0);
         [fpp,tfp]=ksdensity(fpt,'width',0.1,'Function','survivor');
         subplot(ndof,1,i); 
         hold on
-        scatter(fpt,linspace(0,1,numel(fpt)),10,'r','filled','MarkerFaceAlpha',0.2);
+        %scatter(fpt,linspace(0,1,numel(fpt)),10,'r','filled','MarkerFaceAlpha',0.2);
         plot(time, P(i,:)','k','linewidth',2);
-        plot(tfp, fpp,'b--','linewidth',2);
+        plot(tfp, fpp,'r--','linewidth',2);
         
-        legend('MCS','Analytical','KDE','interpreter','latex','FontSize', 10)
-        title('Survival probability', 'Interpreter', 'latex', 'FontSize', 16)
-        xlabel('Time', 'interpreter','latex', 'FontSize', 14)
-        ylabel('Propability', 'interpreter','latex', 'FontSize', 14)
+        legend('Analytical','MCS','interpreter','latex')
+        title('Survival Probability')
+        xlabel('Time')
+        ylabel('Propability')
         xlim([0 T])
         ylim([0 1])
     end

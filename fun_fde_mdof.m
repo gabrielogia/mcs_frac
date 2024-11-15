@@ -1,4 +1,4 @@
-function x_dot = fun_fde_mdof(t,x,ndof,MiC,MiK,Mi,mass,damping,stiffness,epx,is_base,w,tt)
+function x_dot = fun_fde_mdof(t,x,ndof,MiC,MiK,Mi,mass,damping,stiffness,epx,is_base,w)
 
     x_dot = zeros(3*ndof,1);
     
@@ -15,7 +15,7 @@ function x_dot = fun_fde_mdof(t,x,ndof,MiC,MiK,Mi,mass,damping,stiffness,epx,is_
     f = zeros(ndof, 1);
     g0 = zeros(ndof, 1);
     for i=1:ndof
-        f(i,1) = scale(i)*interp1(tt,w(i,:),t,'linear');
+        f(i,1) = scale(i)*w(i);
         g0(i,1) = epx(i)*stiffness(i)*x(i).^3;
     end
 

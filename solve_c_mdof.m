@@ -12,9 +12,9 @@ function dc = solve_c_mdof(t, c, beta, omega0, time,q)
     
     %c(t)
     %dc = -(beta_eq)*c + pi*Sw(omega)/omega_eq_2;
-
-    %Sx = @(x)( Sw(x)./( (omega_eq_2 - x.^2).^2 + (beta_eq*x).^2 ) );
-    Sx = @(x)( Sw(x)./( abs(omega_eq_2 - x.^2 + beta_eq*(1i*x).^q).^2 )  );
+    
+    Sx = @(x)( Sw(x)./( (omega_eq_2 - x.^2).^2 + (beta_eq*x).^2 ) );
+    %Sx = @(x)( Sw(x)./( abs(omega_eq_2 - x.^2 + beta_eq*(1i*x).^q).^2 )  );
     s2 = 2*integral(Sx,0,Inf);
     dc = beta_eq.* (s2-c);
     

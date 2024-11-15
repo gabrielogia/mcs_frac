@@ -7,14 +7,15 @@ function x_dot = fun_ode_mdof(t,x,ndof,MiC,MiK,Mi,mass,damping,stiffness,epx,is_
     else
         scale = ones(ndof,1);
     end
-
-    H = [zeros(ndof,ndof) eye(ndof); -MiK -MiC];
+    H = [zeros(ndof,ndof) eye(ndof);
+        -MiK -MiC];
+  
     f = zeros(ndof, 1);
     g0 = zeros(ndof, 1);
-
     for i=1:ndof
         f(i,1) = scale(i)*interp1(tt,w(i,:),t,'linear');
         g0(i,1) = epx(i)*stiffness(i)*x(i).^3;
+
     end
 
     Mf = -Mi*f;
