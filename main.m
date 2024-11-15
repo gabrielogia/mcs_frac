@@ -27,8 +27,8 @@ epx = 0.2*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
-damping = 5*ones(1,ndof);
-stiffness = 50*ones(1,ndof);
+damping = 20*ones(1,ndof);
+stiffness = 150*ones(1,ndof);
 
 % Bouc-Wen parameters
 a_bw = 0.5*ones(1, ndof);
@@ -74,7 +74,8 @@ run_mcs = true;
 run_fps = true;
 
 % Base string to save files
-str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d', oscillator, ndof, q, max(epx), dT, ns);
+str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f', ...
+    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness));
 
 if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
@@ -181,23 +182,31 @@ end
 %% plot pdf surface
 bar = ones(size(time_out))*barrier(1);
 ha = ones(size(time_out))*1000;
-figure('color',[1 1 1])
+
+fig = figure('color',[1 1 1]);
 subplot(2,1,1)
 hold on
-surf(time_out,av,pr(:,:,1));shading interp
+surf(time_out,av,pr(:,:,1));
+shading interp
 plot3(time_out,bar,ha,'r','linewidth',2)
 view([0,90])
 clim([0,4])
-xlabel('Time')
-ylabel('Amplitude')
+xlabel('Time','interpreter','latex', 'FontSize', 14)
+ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
+title('Empirical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
+
 subplot(2,1,2)
 hold on
-surf(time_out,av,pa(:,:,1));shading interp
+surf(time_out,av,pa(:,:,1));
+shading interp
 plot3(time_out,bar,ha,'r','linewidth',2)
 view([0,90])
 clim([0,4])
-xlabel('Time')
-ylabel('Amplitude')
+xlabel('Time','interpreter','latex', 'FontSize', 14)
+ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
+title('Analytical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
+
+saveas(fig, strcat('plots/pdfs_', str, '.pdf'))
 
 %% plot omega_eq, beta_eq, and var displacement
 fig = figure('color',[1 1 1]);
