@@ -1,7 +1,4 @@
 function [tt,response_frac] = fde45_mdof_new(fun,tspan,x0,q,wv)
-    %N = 10000;
-    %tt = linspace(tspan(1), tspan(end), N)';
-
     tt = tspan;
     N = numel(tspan);
     n = numel(x0);
@@ -12,6 +9,7 @@ function [tt,response_frac] = fde45_mdof_new(fun,tspan,x0,q,wv)
     frac_der = zeros(ndof,length(tt));
     
     response_frac(:,1) = x0;
+    
     x_dot = x0*0;
     response_frac(:,2) = x0 + x_dot*dt;
     
@@ -24,7 +22,6 @@ function [tt,response_frac] = fde45_mdof_new(fun,tspan,x0,q,wv)
     Tm = V.^(1-q) - U.^(1-q);
 
     for i=1:length(tt)-1
-
         w1 = wv(:,i);
         w3 = wv(:,i+1);
         w2 = 0.5*(w1 + w3);
@@ -48,12 +45,10 @@ function [tt,response_frac] = fde45_mdof_new(fun,tspan,x0,q,wv)
       
         Temp1 = Tm(end-i+1:end);
 
-    
         for ii=1:ndof
             dif_x(ii,i) = response_frac(ii,i+1)-response_frac(ii,i);
             Temp2 = (dif_x(ii,:)*Temp1');
             frac_der(ii,i+1) = (1./(gamma(2-q).*dt.^q)).*Temp2;
             response_frac(2*ndof+ii,i+1) = frac_der(ii,i+1);
         end
-
     end

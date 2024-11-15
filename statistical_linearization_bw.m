@@ -17,7 +17,6 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
     keq = zeros(ndof, 1);
     ceq = 0.000001*ones(ndof, 1);
 
-    % Loop in time
     for ii=1:ntime
         t = time(ii);
         

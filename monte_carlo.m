@@ -7,13 +7,10 @@ function [vx,time_out,first_passage_time,state,velo,amplitude] = ...
     MiK = Mi*K;
     ndof = size(M,1);
     
-    % Excitation Power Spectrum:
     for i=1:ndof
         EPS{i}.fun = @(f,t)( evolutionary_power_spectrum(f, t) );
     end
     
-    %MCS
-    %tt = linspace(0, T, 30000);
     tt = 0:dT:T;
     nt = numel(tt);
     
@@ -25,20 +22,11 @@ function [vx,time_out,first_passage_time,state,velo,amplitude] = ...
     time_out = linspace(tt(1), tt(end), Nrk)';
     
     parfor i=1:ns
-        
         wv = simulate_process(tt, ndof, EPS, nonstat, is_base, fmax_ps);
-        %if q==1
-%             xini = zeros(2*ndof,1);
-%             [t1,X] = ode89(@(t,x) fun_ode_mdof(t,x,ndof,MiC,MiK,Mi,...
-%                 mass,damping,stiffness,epx,is_base,w,tt),...
-%                 [0 T], xini);
-%             X=X';
-        %else
         xini = zeros(3*ndof,1);
 
         [t1,X] = fde45_mdof_new(@(t,x,w) fun_fde_mdof(t,x,ndof,MiC,MiK,Mi,...
             mass,damping,stiffness,epx,is_base,w), tt, xini, q, wv);
-        %end
 
         for j=1:ndof
             xint = interp1(t1,X(j, :),time_out,'pchip'); %just the displacement
@@ -47,7 +35,6 @@ function [vx,time_out,first_passage_time,state,velo,amplitude] = ...
             velo(j, :, i) = vint;
             amplitude(j,:,i) = get_amplitude(xint);
         end
-
     end
 
     [~, n_time, ~] = size(state); % z time dimension.
@@ -60,17 +47,12 @@ function [vx,time_out,first_passage_time,state,velo,amplitude] = ...
 
     vx = vx';
 
-
-    %% ==========================
-    % First passage time
-   
+    %% First passage time
     first_passage_time = zeros(ns,ndof);
     for i=1:ns
         
         for j=1:ndof
             barrier = bar(j);
-            % sample_path = state(i,j,:);
-            %sample_path = state(j,:,i);
             sample_path = amplitude(j,:,i);
             
             time_aux = time_out(abs(sample_path) > barrier);
@@ -82,13 +64,10 @@ function [vx,time_out,first_passage_time,state,velo,amplitude] = ...
                 first_passage_time(i,j) = time_aux(1);
             end
         end
-
     end
-        
 end
 
 function amp = get_amplitude(x)
-
     [r,c] = size(x);
 
     if r>c
@@ -96,7 +75,6 @@ function amp = get_amplitude(x)
     end
 
     npadd = ceil(max(r,c)/5);
-    % X = padarray(x',npadd,'circ')';
     X = padarray(x',npadd,'symmetric')';
 
     if r>c
@@ -105,6 +83,4 @@ function amp = get_amplitude(x)
   
     A = abs(hilbert(X));
     amp = A(npadd+1:end-npadd);
-
 end
-

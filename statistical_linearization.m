@@ -21,7 +21,7 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
         M_ps = diag(m);
     end
 
-    for i=1:ntime %loop in time
+    for i=1:ntime 
         t = time(i);
         [Ceq, Keq] = get_equivalent_ck(ceq, keq, ndof);
 
@@ -41,7 +41,7 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
             H_ps = zeros(ndof, nfreq);
             H_ps_freq = zeros(ndof, nfreq);
           
-            for j=1:nfreq %loop in frequency
+            for j=1:nfreq
                 f = freq(j);
                 H = get_H(f,Mt,Ct,Kt, q);
                 
@@ -64,8 +64,8 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
          
             for l=1:ndof
 
-                Ex = 2*trapz(freq, H_ps(l,:));% double sided
-                Exd = 2*trapz(freq, H_ps_freq(l,:));%double sided
+                Ex = 2*trapz(freq, H_ps(l,:));
+                Exd = 2*trapz(freq, H_ps_freq(l,:));
              
                 sx2(l) = Ex;
                 sv2(l) = Exd;
@@ -108,6 +108,4 @@ function [Ceq, Keq]=get_equivalent_ck(ceq, keq, ndof)
         Ceq(i, i) = ceq(i);
         Keq(i, i) = keq(i);
     end
-
 end
-

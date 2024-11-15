@@ -105,6 +105,7 @@ for i=1:ndof
     for j=1:numel(time)
         t=time(j);
         sig2t = varx_sl(i,j);
+        
         Sw = @(x)( evolutionary_power_spectrum(x, t) );
         Sx = @(x,y)( Sw(x)./( abs(omega_eq_2(i,j) - x.^2 + y*(1i*x).^q).^2 )  );
         sfun = @(y) ( (sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
@@ -156,7 +157,7 @@ if run_mcs
         nonstat, is_base,T,dT, barrier);
     elseif (oscillator == "bw")
         [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
-            monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw, xy);
+        monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw, xy);
     end
 end
 
@@ -242,7 +243,6 @@ saveas(fig, strcat('plots/displacement_variance_', str, '.pdf'))
 
 %% Survival Probability
 if run_fps
-
     bt = beta_eq;
     P=survival_probability_3(barrier,c,time,10,bt,omega_eq_2,stiffness,12);
 
@@ -253,7 +253,6 @@ if run_fps
         [fpp,tfp]=ksdensity(fpt,'width',0.1,'Function','survivor');
         subplot(ndof,1,i); 
         hold on
-        %scatter(fpt,linspace(0,1,numel(fpt)),10,'r','filled','MarkerFaceAlpha',0.2);
         plot(time, P(i,:)','k','linewidth',2);
         plot(tfp, fpp,'r--','linewidth',2);
         
