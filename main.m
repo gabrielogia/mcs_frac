@@ -20,7 +20,7 @@ nonstat = true;
 ndof = 3;
 
 % Fractional derivative:
-q = 0.75; 
+q = 0.35; 
 
 % Nonlinearity parameter:
 epx = 0.2*ones(1,ndof);
@@ -61,7 +61,7 @@ end
 fmax_ps = 50; 
 
 % Number of samples in the MCS:
-ns = 100;
+ns = 12000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
