@@ -20,7 +20,7 @@ nonstat = true;
 ndof = 3;
 
 % Fractional derivative:
-q = 0.5; 
+q = 0.75; 
 
 % Nonlinearity parameter:
 epx = 0.2*ones(1,ndof);
@@ -28,7 +28,7 @@ epx = 0.2*ones(1,ndof);
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
 damping = 20*ones(1,ndof);
-stiffness = 150*ones(1,ndof);
+stiffness = 200*ones(1,ndof);
 
 % Bouc-Wen parameters
 a_bw = 0.5*ones(1, ndof);
@@ -65,7 +65,7 @@ ns = 100;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
-nfreq = 500;
+nfreq = 1000;
 
 % Run MCS:
 run_mcs = true;
@@ -207,6 +207,7 @@ ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
 title('Analytical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
 
 saveas(fig, strcat('plots/pdfs_', str, '.pdf'))
+save(strcat('data/pdfs_', str, '.mat'), "time_out", "av", "pr", "pa")
 
 %% plot omega_eq, beta_eq, and var displacement
 fig = figure('color',[1 1 1]);
@@ -220,6 +221,7 @@ for i=1:ndof
 end
 
 saveas(fig, strcat('plots/omegaeq_', str, '.pdf'))
+save(strcat('data/omegaeq_', str, '.mat'), "time", "omega_eq_2")
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof
@@ -232,6 +234,7 @@ for i=1:ndof
 end
 
 saveas(fig, strcat('plots/betaeq_', str, '.pdf'))
+save(strcat('data/betaeq_', str, '.mat'), "time", "beta_eq")
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof
@@ -249,13 +252,14 @@ for i=1:ndof
 end
 
 saveas(fig, strcat('plots/displacement_variance_', str, '.pdf'))
+save(strcat('data/displacement_variance_', str, '.mat'), "time", "varx_sl", "c", "time_out", "varx_mcs")
 
 %% Survival Probability
 if run_fps
     bt = beta_eq;
     P=survival_probability_3(barrier,c,time,10,bt,omega_eq_2,stiffness,12);
 
-    figure('color',[1 1 1]);
+    fig = figure('color',[1 1 1]);
     for i=1:ndof
         fpt = first_passage_time(:,i);
         fpt = fpt(fpt>0);
@@ -275,5 +279,6 @@ if run_fps
 end
 
 saveas(fig, strcat('plots/firsttimepassage_', str, '.pdf'))
+save(strcat('data/firsttimepassage_', str, '.mat'), "time", "P", "tfp", "fpp")
 
 toc
