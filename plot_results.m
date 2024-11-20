@@ -5,6 +5,10 @@ close all
 files = dir('data/');
 epx = 0.20;
 
+%% Equivalent damping and natural frequencies for the same q
+vec_omega = load(strcat('data/', files(i).name));
+vec_beta = load('betaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.90_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00');
+
 %% Equivalent natural frequency
 str1 = 'omegaeq_';
 str2 = sprintf('nonlinearity_%.2f', epx);
