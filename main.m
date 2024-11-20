@@ -20,10 +20,10 @@ nonstat = true;
 ndof = 3;
 
 % Fractional derivative:
-q = 0.35; 
+q = 0.50; 
 
 % Nonlinearity parameter:
-epx = 0.9*ones(1,ndof);
+epx = 1.4*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
