@@ -23,7 +23,7 @@ ndof = 3;
 q = 0.50; 
 
 % Nonlinearity parameter:
-epx = 1.4*ones(1,ndof);
+epx = 2.2*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
