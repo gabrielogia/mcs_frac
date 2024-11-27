@@ -15,11 +15,34 @@ for i=1:1:numel(freq)
     end
 end
 
+fig = figure(1);
+subplot(2, 1, 1)
 surf(time, freq, eps)
-xlabel('Time (s)', 'FontSize', 14)
-ylabel('Frequency (rad/s)','FontSize', 14)
-zlabel('EPS','FontSize', 14)
-title('Nonseparable excitation evolutionary power spectrum', 'FontSize', 16)
+xlabel('Time (s)', 'FontSize', 12, 'Interpreter','latex')
+ylabel('Frequency (rad/s)','FontSize', 12, 'Interpreter','latex')
+zlabel('EPS','FontSize', 12, 'Interpreter','latex')
 colormap jet
 shading interp
-colorbar
+view([69 16])
+
+ax = gca;
+ax.XAxis.FontSize = 12;
+ax.YAxis.FontSize = 12;
+set(gca,'TickLabelInterpreter','latex')
+
+subplot(2, 1, 2)
+surf(time, freq, eps)
+xlabel('Time (s)', 'FontSize', 12, 'Interpreter','latex')
+ylabel('Frequency (rad/s)','FontSize', 12, 'Interpreter','latex')
+colormap jet
+shading interp
+view([0 90])
+
+ax = gca;
+ax.XAxis.FontSize = 12;
+ax.YAxis.FontSize = 12;
+set(gca,'TickLabelInterpreter','latex')
+
+%saveas(fig, 'plots/eps', 'pdf')
+set(fig,'papersize',[6.75 5.0]);
+print(fig,'plots/eps','-dpdf')

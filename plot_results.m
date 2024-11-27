@@ -3,7 +3,6 @@ clear
 close all
 
 files = dir('data/');
-epx = 0.2;
 lam = 0.7;
 
 %% Equivalent damping and natural frequencies for the same q
@@ -14,26 +13,40 @@ time = vec_omega.time;
 omega_eq_2 = vec_omega.omega_eq_2;
 beta_eq = vec_beta.beta_eq;
 
-figure(1)
+fig = figure(1);
 subplot(2,1,1)
 plot(time, omega_eq_2', 'linewidth',2)
-xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-ylabel('$\omega^2_{eq}(t) $ (rad/s)','interpreter','latex', 'FontSize', 14)
-aux = sprintf("Oscillator' equivalent natural frequencies");
-title(aux, 'FontSize', 14)
+xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
+ylabel('$\omega_{eq}^2$  (N/m)','interpreter','latex', 'FontSize', 12)
+%aux = sprintf("System's equivalent stiffness coefficient");
+%title(aux, 'FontSize', 14)
 legend('DOF 1', 'DOF 2', 'DOF 3')
-grid(1)
+grid
+
+ax = gca;
+ax.XAxis.FontSize = 12;
+ax.YAxis.FontSize = 12;
+set(gca,'TickLabelInterpreter','latex')
 
 subplot(2,1,2)
 plot(time, beta_eq', 'linewidth',2)
-xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-ylabel('$\beta_{eq}(t) $ (Ns/m)','interpreter','latex', 'FontSize', 14)
-aux = sprintf("Oscillator' equivalent damping");
-title(aux, 'FontSize', 14)
+xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
+ylabel('$\beta_{eq}$ (Ns/m)','interpreter','latex', 'FontSize', 12)
+%aux = sprintf("Oscillator' equivalent damping coefficient");
+%title(aux, 'FontSize', 14)
 legend('DOF 1', 'DOF 2', 'DOF 3', 'Location', 'southeast')
-grid(1)
+grid
+
+ax = gca;
+ax.XAxis.FontSize = 12;
+ax.YAxis.FontSize = 12;
+set(gca,'TickLabelInterpreter','latex')
+
+set(fig,'papersize',[6.75 5.0]);
+print(fig,'plots/equivalent_stiff_damp_same_q_same_e','-dpdf')
 
 %% Equivalent natural frequency
+epx = 0.2;
 str1 = 'omegaeq_';
 str2 = sprintf('nonlinearity_%.2f', epx);
 
@@ -49,20 +62,23 @@ for i = 1:1:numel(files)
         time = vec.time;
         omega_eq_2 = vec.omega_eq_2;
     
-        figure(2)
+        fig = figure(2);
         for dof = 1:1:ndof
             subplot(ndof,1,ndof - dof + 1); 
             hold on
             plot(time,omega_eq_2(dof,:),'linewidth',2) % MCS
-            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-            ylabel('$\omega^2_{eq}(t) $ (rad/s)','interpreter','latex', 'FontSize', 14)
-            aux = sprintf("Oscillator' equivalent natural frequency. DOF: %d;", dof);
-            title(aux, 'FontSize', 14)
+            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
+            ylabel('$\omega^2_{eq} $ (N/m)','interpreter','latex', 'FontSize', 12)
+            aux = sprintf("DOF: %d", dof);
+            title(aux, 'FontSize', 10)
             grid;
             legend('q = 0.35', 'q = 0.5', 'q = 0.75')
         end
     end
 end
+
+set(fig,'papersize',[6.75 5.0]);
+print(fig,'plots/equivalent_stiff_different_q','-dpdf')
 
 %% Equivalent damping
 str1 = 'betaeq_';
