@@ -82,6 +82,7 @@ print(fig,'plots/equivalent_stiff_different_q','-dpdf')
 
 %% Equivalent damping
 str1 = 'betaeq_';
+str2 = sprintf('nonlinearity_%.2f', epx);
 
 for i = 1:1:numel(files)
     if(contains(files(i).name, str1) && contains(files(i).name, str2))
@@ -95,24 +96,30 @@ for i = 1:1:numel(files)
         time = vec.time;
         beta_eq = vec.beta_eq;
     
-        figure(3)
+        fig = figure(3);
         for dof = 1:1:ndof
             subplot(ndof,1,ndof - dof + 1); 
             hold on
             plot(time,beta_eq(dof,:),'linewidth',2) % MCS
-            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-            ylabel('$\beta_{eq}(t) $ (Ns/m)','interpreter','latex', 'FontSize', 14)
-            aux = sprintf("Oscillator equivalent damping. DOF: %d;", dof);
-            title(aux, 'FontSize', 14)
+            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
+            ylabel('$\beta_{eq} $ (Ns/m)','interpreter','latex', 'FontSize', 12)
+            aux = sprintf("DOF: %d", dof);
+            title(aux, 'FontSize', 10)
             grid;
             legend('q = 0.35', 'q = 0.5', 'q = 0.75')
         end
     end
 end
 
+set(fig,'papersize',[6.75 5.4]);
+print(fig,'plots/equivalent_beta_different_q','-dpdf')
+
 %% Plot amplitude PDF
 str1 = 'pdfs_';
-q = 0.75;
+epx = 0.2;
+ndof = 3;
+str2 = sprintf('nonlinearity_%.2f', epx);
+q = 0.50;
 
 for i = 1:1:numel(files)
     if (contains(files(i).name, 'displacement_variance') && contains(files(i).name, str2))
@@ -148,40 +155,42 @@ for i = 1:1:numel(files)
             ha = ones(size(time_out))*1000;
 
             for j = 1:1:ndof
-                figure(4)
+                fig = figure(4);
                 colormap jet
                 subplot(3,2,2*j-1)
-                colorbar
                 hold on
                 surf(time_out,av,pr(:,:,3-j+1));
                 plot3(time_out,ones(size(time_out))*barrier(3-j+1),ha,'r','linewidth',2)
-                clim([0,35])
-                ylim([0,0.35])
+                clim([0,25])
+                ylim([0,0.4])
                 shading interp
-                xlabel('Time (s)','interpreter','latex', 'FontSize', 14)
-                ylabel('Amplitude (m)','interpreter','latex', 'FontSize', 14)
-                aux = sprintf('MCS probability density function. DOF: %d', 3-j+1);
-                title(aux, 'FontSize', 14)
+                xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
+                ylabel('Amplitude (m)','interpreter','latex', 'FontSize', 12)
+                aux = sprintf('MCS PDF. DOF: %d', 3-j+1);
+                title(aux, 'FontSize', 10)
         
                 subplot(3,2,2*j)
                 hold on
-                colorbar
                 surf(time_out,av,pa(:,:,3-j+1));
                 plot3(time_out,ones(size(time_out))*barrier(3-j+1),ha,'r','linewidth',2)
-                clim([0,35])
-                ylim([0,0.35])
+                clim([0,25])
+                ylim([0,0.4])
                 shading interp
-                xlabel('Time (s)','interpreter','latex', 'FontSize', 14)
-                ylabel('Amplitude (m)','interpreter','latex', 'FontSize', 14)
-                aux = sprintf('Analytical probability density function. DOF: %d', 3-j+1);
-                title(aux, 'FontSize', 14)
+                xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
+                ylabel('Amplitude (m)','interpreter','latex', 'FontSize', 12)
+                aux = sprintf('Approximate analytical PDF. DOF: %d', 3-j+1);
+                title(aux, 'FontSize', 10)
             end
             break
         end
     end
 end
 
+set(fig,'papersize',[6.75 5.4]);
+print(fig,'plots/amplitude_pdf','-dpdf')
+
 %% survival probability
+close all
 str1 = 'firsttimepassage_';
 
 k = 1;
@@ -197,17 +206,17 @@ for i = 1:1:numel(files)
         tfp = vec.tfp;
         T = 20;
 
-        figure(5)
+        fig = figure(5);
         subplot(ndof,3,k); 
         hold on
         plot(time, P(3,:)','k','linewidth',2);
         plot(tfp, fpp,'r--','linewidth',2);
         
         legend('Analytical','MCS','interpreter','latex')
-        aux = sprintf('Survival probability. Fractional: %.2f; DOF: %d', vec(:).q, 3);
-        title(aux, 'FontSize', 14)
-        xlabel('Time','interpreter','latex', 'FontSize', 14)
-        ylabel('Propability','interpreter','latex', 'FontSize', 14)
+        aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, 3);
+        title(aux, 'FontSize', 13, 'interpreter','latex')
+        xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
+        ylabel('Survival propability','interpreter','latex', 'FontSize', 12)
         xlim([0 T])
         ylim([0 1])
 
@@ -217,10 +226,10 @@ for i = 1:1:numel(files)
         plot(tfp, fpp,'r--','linewidth',2);
         
         legend('Analytical','MCS','interpreter','latex')
-        aux = sprintf('Survival probability. Fractional: %.2f; DOF: %d', vec(:).q, 2);
-        title(aux, 'FontSize', 14)
-        xlabel('Time','interpreter','latex', 'FontSize', 14)
-        ylabel('Propability','interpreter','latex', 'FontSize', 14)
+        aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, 2);
+        title(aux, 'FontSize', 13, 'interpreter','latex')
+        xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
+        ylabel('Survival propability','interpreter','latex', 'FontSize', 12)
         xlim([0 T])
         ylim([0 1])
 
@@ -230,16 +239,19 @@ for i = 1:1:numel(files)
         plot(tfp, fpp,'r--','linewidth',2);
         
         legend('Analytical','MCS','interpreter','latex')
-        aux = sprintf('Survival probability. Fractional: %.2f; DOF: %d', vec(:).q, 1);
-        title(aux, 'FontSize', 14)
-        xlabel('Time','interpreter','latex', 'FontSize', 14)
-        ylabel('Propability','interpreter','latex', 'FontSize', 14)
+        aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, 1);
+        title(aux, 'FontSize', 13, 'interpreter','latex')
+        xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
+        ylabel('Survival propability','interpreter','latex', 'FontSize', 12)
         xlim([0 T])
         ylim([0 1])
 
         k = k + 1;
     end
 end
+
+set(fig,'papersize',[6.8 5.5]);
+print(fig,'plots/survival_prop','-dpdf')
 
 %% Equivalent natural frequency for diferent non-linearities
 str1 = 'omegaeq_';
@@ -258,20 +270,23 @@ for i = 1:1:numel(files)
         time = vec.time;
         omega_eq_2 = vec.omega_eq_2;
     
-        figure(6)
+        fig = figure(6);
         for dof = 1:1:ndof
             subplot(ndof,1,ndof - dof + 1); 
             hold on
             plot(time,omega_eq_2(dof,:),'linewidth',2)
-            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-            ylabel('$\omega^2_{eq}(t) $ (rad/s)','interpreter','latex', 'FontSize', 14)
-            aux = sprintf('Oscillator equivalent natural frequency. DOF: %d; Fractional: %.2f', dof, q);
-            title(aux, 'FontSize', 14)
-            grid;
-            legend('$\epsilon = 0.20$', '$\epsilon = 0.90$', '$\epsilon = 1.40$', 'interpreter','latex', 'FontSize', 12)
+            grid(1);
+            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
+            ylabel('$\omega^2_{eq}$ (N/m)','interpreter','latex', 'FontSize', 12)
+            aux = sprintf('DOF: %d', dof);
+            title(aux, 'FontSize', 10)
+            legend('\epsilon = 0.20', '\epsilon = 0.90', '\epsilon = 1.40', '\epsilon = 2.20')
         end
     end
 end
+
+set(fig,'papersize',[7 5.3]);
+print(fig,'plots/equivalent_stiff_different_epi','-dpdf')
 
 %% Equivalent damping for diferent non-linearities
 str1 = 'betaeq_';
@@ -290,20 +305,23 @@ for i = 1:1:numel(files)
         time = vec.time;
         beta_eq = vec.beta_eq;
     
-        figure(7)
+        fig = figure(7);
         for dof = 1:1:ndof
             subplot(ndof,1,ndof - dof + 1); 
             hold on
             plot(time,beta_eq(dof,:),'linewidth',2) % MCS
-            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-            ylabel('$\beta_{eq}(t) $ (Ns/m)','interpreter','latex', 'FontSize', 14)
-            aux = sprintf('Oscillator equivalent damping. DOF: %d; Fractional: %.2f', dof, q);
-            title(aux, 'FontSize', 14)
-            grid;
-            legend('$\epsilon = 0.20$', '$\epsilon = 0.90$', '$\epsilon = 1.40$', 'interpreter','latex', 'FontSize', 13,'Location','southeast')
+            grid(1);
+            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
+            ylabel('$\beta_{eq}$ (Ns/m)','interpreter','latex', 'FontSize', 12)
+            aux = sprintf('DOF: %d', dof);
+            title(aux, 'FontSize', 10)
+            legend('\epsilon = 0.20', '\epsilon = 0.90', '\epsilon = 1.40', '\epsilon = 2.20', 'Location', 'southeast')
         end
     end
 end
+
+set(fig,'papersize',[7 5.3]);
+print(fig,'plots/equivalent_damping_different_epi','-dpdf')
 
 %%
 a = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.20_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00.mat');
