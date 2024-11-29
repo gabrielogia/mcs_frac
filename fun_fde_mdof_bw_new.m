@@ -24,4 +24,3 @@ function x_dot = fun_fde_mdof_bw_new(t,x,n,MiC,MiKa,MiK1_a,Mi,is_base,w,A,gamma1
     G(3*n+1:4*n,3*n+1:4*n) = eye(n);
 
     x_dot = G*x + F + H0;
-

@@ -1,4 +1,4 @@
-function [vx,time_out,first_passage_time,state,amplitude] = monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat, ...
+function [vx,time_out,first_passage_time,state,velo, amplitude] = monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat, ...
                                                                            is_base, T, dT, bar, ndof, A, gamma1, beta1,xy) 
     Ms = M(1:ndof,1:ndof);
     Cs = C(1:ndof,1:ndof);
@@ -34,13 +34,14 @@ function [vx,time_out,first_passage_time,state,amplitude] = monte_carlo_bw_new(n
             is_base,w,A,gamma1,beta1,nn, xy), tt, xini, q, wv);
 
         for j=1:ndof
-            xint = interp1(t1,X(j, :),time_out,'pchip'); %just the displacement
+            xint = interp1(t1,X(j, :),time_out,'pchip');
+            vint = interp1(t1,X(j+ndof, :),time_out,'pchip');
             state(j, :, i) = xint;
+            velo(j, :, i) = vint;
             amplitude(j,:,i) = get_amplitude(xint);
         end
     end
 
-    
     [~, n_time, ~] = size(state); % z time dimension.
 
     for i=1:n_time

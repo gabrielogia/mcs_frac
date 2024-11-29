@@ -1,7 +1,7 @@
 function Sw = evolutionary_power_spectrum(freq, t)
     
     b0 = 0.2;
-    S0 = 1;
+    S0 = 0.2;
 
     aux1 = (freq./(5*pi)).^2;
     aux2 = (freq./(10*pi)).^2;

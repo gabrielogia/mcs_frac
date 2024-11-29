@@ -10,7 +10,7 @@ tic
 rng(1111);
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -23,7 +23,7 @@ ndof = 3;
 q = 0.50; 
 
 % Nonlinearity parameter:
-epx = 2.2*ones(1,ndof);
+epx = 1.2*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
@@ -39,7 +39,7 @@ n_bw = 1;
 y0_bw = 1;
 
 % Yielding displacement.
-xy=0.1;
+xy=0.5;
 
 % Maximum time:
 T = 20;
@@ -58,10 +58,10 @@ elseif (oscillator == "bw")
 end
 
 % Maximum frequency of the power spectrum:
-fmax_ps = 50; 
+fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 12000;
+ns = 150;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -157,7 +157,7 @@ if run_mcs
         monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,...
         nonstat, is_base,T,dT, barrier);
     elseif (oscillator == "bw")
-        [varx_mcs, time_out, first_passage_time,response,amplitude] = ...
+        [varx_mcs, time_out, first_passage_time,response,velocity, amplitude] = ...
         monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw, xy);
     end
 end
