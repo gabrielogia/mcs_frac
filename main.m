@@ -23,7 +23,7 @@ ndof = 3;
 q = 0.50; 
 
 % Nonlinearity parameter:
-epx = 1.2*ones(1,ndof);
+epx = 1.9*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
@@ -32,7 +32,7 @@ stiffness = 200*ones(1,ndof);
 
 % Bouc-Wen parameters
 a_bw = 0.5*ones(1, ndof);
-A_bw = 1;
+A_bw = 0.5;
 beta_bw = 0.5;
 gamma_bw = 0.5;
 n_bw = 1;
@@ -42,13 +42,13 @@ y0_bw = 1;
 xy=0.5;
 
 % Maximum time:
-T = 20;
+T = 10;
 
 % Barrier:
 lam = 0.7;
 
 % Time increment for the Monte Carlo simulation.
-dT = 0.001; %dT = 0.0001;
+dT = 0.0001; %dT = 0.0001;
 
 % Construct matrices M, C, and K:
 if (oscillator == "duffing")
@@ -61,7 +61,7 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 150;
+ns = 120;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -190,7 +190,7 @@ surf(time_out,av,pr(:,:,1));
 shading interp
 plot3(time_out,bar,ha,'r','linewidth',2)
 view([0,90])
-clim([0,4])
+clim([0,30])
 xlabel('Time','interpreter','latex', 'FontSize', 14)
 ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
 title('Empirical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
@@ -201,7 +201,7 @@ surf(time_out,av,pa(:,:,1));
 shading interp
 plot3(time_out,bar,ha,'r','linewidth',2)
 view([0,90])
-clim([0,4])
+clim([0,30])
 xlabel('Time','interpreter','latex', 'FontSize', 14)
 ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
 title('Analytical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
