@@ -1,4 +1,4 @@
-function [vx,time_out,first_passage_time,state,velo, amplitude] = monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat, ...
+function [vx,time_out,first_passage_time,state,velo, hyst, amplitude] = monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat, ...
                                                                            is_base, T, dT, bar, ndof, A, gamma1, beta1,xy) 
     Ms = M(1:ndof,1:ndof);
     Cs = C(1:ndof,1:ndof);
@@ -28,7 +28,8 @@ function [vx,time_out,first_passage_time,state,velo, amplitude] = monte_carlo_bw
     
     parfor i=1:ns
         wv = simulate_process(tt, ndof, EPS, nonstat, is_base, fmax_ps);
-
+        % Remove it:
+        %wv = 2*sin(5*tt);
         xini = zeros(4*ndof,1);
         [t1,X] = fde45_mdof_bw(@(t,x,w) fun_fde_mdof_bw_new(t,x,ndof,MiC,MiKa,MiK1_a,Mi,...
             is_base,w,A,gamma1,beta1,nn, xy), tt, xini, q, wv);
@@ -36,8 +37,10 @@ function [vx,time_out,first_passage_time,state,velo, amplitude] = monte_carlo_bw
         for j=1:ndof
             xint = interp1(t1,X(j, :),time_out,'pchip');
             vint = interp1(t1,X(j+ndof, :),time_out,'pchip');
+            zint = interp1(t1,X(j+2*ndof, :),time_out,'pchip');
             state(j, :, i) = xint;
             velo(j, :, i) = vint;
+            hyst(j, :, i) = zint;
             amplitude(j,:,i) = get_amplitude(xint);
         end
     end

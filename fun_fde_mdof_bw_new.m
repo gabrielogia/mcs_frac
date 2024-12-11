@@ -14,7 +14,7 @@ function x_dot = fun_fde_mdof_bw_new(t,x,n,MiC,MiKa,MiK1_a,Mi,is_base,w,A,gamma1
   
     f0M = Mi*f0;
     F = zeros(4*n,1);
-    F(n+1:2*n) = f0M/1;
+    F(n+1:2*n) = f0M;
 
     G = zeros(4*n, 4*n);
     G(1:n,n+1:2*n) = eye(n);

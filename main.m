@@ -20,7 +20,7 @@ nonstat = true;
 ndof = 3;
 
 % Fractional derivative:
-q = 0.35; 
+q = 0.5; 
 
 % Nonlinearity parameter:
 epx = 1.9*ones(1,ndof);
@@ -32,17 +32,17 @@ stiffness = 200*ones(1,ndof);
 
 % Bouc-Wen parameters
 a_bw = 0.5*ones(1, ndof);
-A_bw = 0.5;
+A_bw = 1;
 beta_bw = 0.5;
 gamma_bw = 0.5;
 n_bw = 1;
-y0_bw = 1;
+y0_bw = 0.1;
 
 % Yielding displacement.
-xy=0.5;
+xy=0.1;
 
 % Maximum time:
-T = 8;
+T = 12;
 
 % Barrier:
 lam = 0.7;
@@ -61,7 +61,7 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 12000;
+ns = 16;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -157,7 +157,7 @@ if run_mcs
         monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,...
         nonstat, is_base,T,dT, barrier);
     elseif (oscillator == "bw")
-        [varx_mcs, time_out, first_passage_time,response,velocity, amplitude] = ...
+        [varx_mcs, time_out, first_passage_time,response,velocity, z, amplitude] = ...
         monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw, xy);
     end
 end
@@ -255,6 +255,9 @@ saveas(fig, strcat('plots/displacement_variance_', str, '.pdf'))
 save(strcat('data/displacement_variance_', str, '.mat'), "time", "varx_sl", "c", "time_out", "varx_mcs")
 
 %% Survival Probability
+
+%c = varx_sl;
+
 if run_fps
     bt = beta_eq;
     P=survival_probability_3(barrier,c,time,10,bt,omega_eq_2,stiffness,12);
