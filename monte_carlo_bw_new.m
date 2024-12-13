@@ -60,7 +60,7 @@ function [vx,time_out,first_passage_time,state,velo, hyst, amplitude] = monte_ca
     for i=1:ns
         for j=1:ndof
             barrier = bar(j);
-            sample_path = state(j,:,i);
+            sample_path = amplitude(j,:,i);
             
             time_aux = time_out(abs(sample_path) > barrier);
 
