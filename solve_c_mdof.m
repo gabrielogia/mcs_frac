@@ -5,12 +5,12 @@ function dc = solve_c_mdof(t, c, beta, omega0, time,q)
 
     Sw = @(x)( evolutionary_power_spectrum(x, t) );
     
+    %otimizacao
     Sx = @(x)( Sw(x)./( (omega_eq_2 - x.^2).^2 + (beta_eq*x).^2 ) );
+    s2 = 2*integral(Sx,0,Inf);
 
-    %Sx = @(x)( Sw(x)./( abs(omega_eq_2 - x.^2 + beta_eq*(1i*x).^q).^2 )  );
-    %s2 = 2*integral(Sx,0,Inf);
-
-    s2 = pi*Sw(sqrt(omega_eq_2))/(omega_eq_2*beta_eq);
+    %TMDI formulation and optimization 
+    %s2 = pi*Sw(sqrt(omega_eq_2))/(omega_eq_2*beta_eq);
 
     dc = beta_eq.* (s2-c);
     
