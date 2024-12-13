@@ -31,7 +31,7 @@ damping = 20*ones(1,ndof);
 stiffness = 200*ones(1,ndof);
 
 % Bouc-Wen parameters
-a_bw = 0.5*ones(1, ndof);
+a_bw = 0.3*ones(1, ndof);
 A_bw = 1;
 beta_bw = 0.5;
 gamma_bw = 0.5;
@@ -42,7 +42,7 @@ y0_bw = 0.01;
 xy=y0_bw;
 
 % Maximum time:
-T = 8;
+T = 4;
 
 % Barrier:
 lam = 0.7;
@@ -61,7 +61,7 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 80;
+ns = 40;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -99,14 +99,13 @@ end
 
 %% Equivalent damping and stiffness
 omega_eq_2 = varv_sl./varx_sl;
-
 for i=1:ndof
     omega_eq_2(i,1) = findfirstpoint(omega_eq_2(i,2),omega_eq_2(i,3));
 
     for j=1:numel(time)
         t=time(j);
         sig2t = varx_sl(i,j);
-        
+
         Sw = @(x)( evolutionary_power_spectrum(x, t) );
         Sx = @(x,y)( Sw(x)./( abs(omega_eq_2(i,j) - x.^2 + y*(1i*x).^q).^2 )  );
         sfun = @(y) ( (sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
@@ -123,6 +122,24 @@ for i=1:ndof
 end
 
 beta_eq = beq;
+
+%% TMDI formulation 
+% tt = 0:dT:T;
+% Nrk = 3000;
+% time_out = linspace(tt(1), tt(end), Nrk)';
+% 
+% for i=1:ndof
+%     cx = interp1(time,varx_sl(i,:),time_out,'pchip');
+%     cdx = interp1(time,varv_sl(i,:),time_out,'pchip');
+%     cxdt = gradient(cx,time_out);
+% 
+%     w2 = cdx./cx;
+%     EPS = evolutionary_power_spectrum(sqrt(w2),time_out);
+%     beq(i,:) = (1./cx).*(-cxdt + pi*EPS./w2);
+% 
+%     beta_eq(i,:) = interp1(time_out,beq(i,:),time,'pchip');
+%     omega_eq_2(i,:) = interp1(time_out,w2,time,'pchip');
+% end
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
@@ -186,22 +203,22 @@ ha = ones(size(time_out))*1000;
 fig = figure('color',[1 1 1]);
 subplot(2,1,1)
 hold on
-surf(time_out,av,pr(:,:,1));
+surf(time_out,av,pr(:,:,end));
 shading interp
 plot3(time_out,bar,ha,'r','linewidth',2)
 view([0,90])
-clim([0,30])
+clim([0,200])
 xlabel('Time','interpreter','latex', 'FontSize', 14)
 ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
 title('Empirical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
 
 subplot(2,1,2)
 hold on
-surf(time_out,av,pa(:,:,1));
+surf(time_out,av,pa(:,:,end));
 shading interp
 plot3(time_out,bar,ha,'r','linewidth',2)
 view([0,90])
-clim([0,30])
+clim([0,200])
 xlabel('Time','interpreter','latex', 'FontSize', 14)
 ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
 title('Analytical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
@@ -256,28 +273,30 @@ save(strcat('data/displacement_variance_', str, '.mat'), "time", "varx_sl", "c",
 
 %% Survival Probability
 
-%c = varx_sl;
+cfp=c;
+%cfp = varx_sl;
 
 if run_fps
     bt = beta_eq;
-    P=survival_probability_3(barrier,c,time,10,bt,omega_eq_2,stiffness,12);
+    P=survival_probability_3(barrier,cfp,time,10,bt,omega_eq_2,stiffness,12);
 
     fig = figure('color',[1 1 1]);
     for i=1:ndof
         fpt = first_passage_time(:,i);
         fpt = fpt(fpt>0);
         [fpp,tfp]=ksdensity(fpt,'width',0.1,'Function','survivor');
-        subplot(ndof,1,i); 
+        subplot(ndof,1,ndof-i+1); 
         hold on
         plot(time, P(i,:)','k','linewidth',2);
         plot(tfp, fpp,'r--','linewidth',2);
-        
+
         legend('Analytical','MCS','interpreter','latex')
         title('Survival Probability')
         xlabel('Time')
         ylabel('Propability')
         xlim([0 T])
         ylim([0 1])
+
     end
 end
 
