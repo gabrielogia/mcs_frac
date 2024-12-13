@@ -36,13 +36,13 @@ A_bw = 1;
 beta_bw = 0.5;
 gamma_bw = 0.5;
 n_bw = 1;
-y0_bw = 0.1;
+y0_bw = 0.01;
 
 % Yielding displacement.
-xy=0.1;
+xy=y0_bw;
 
 % Maximum time:
-T = 12;
+T = 8;
 
 % Barrier:
 lam = 0.7;
@@ -61,7 +61,7 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 16;
+ns = 80;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;

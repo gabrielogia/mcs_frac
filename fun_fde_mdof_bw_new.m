@@ -9,7 +9,7 @@ function x_dot = fun_fde_mdof_bw_new(t,x,n,MiC,MiKa,MiK1_a,Mi,is_base,w,A,gamma1
         f0(i,1) = w(i);
         dx1 = x(n+i);
         z1 = x(2*n+i);
-        H0(2*n+i,1) = (A*dx1 - (beta1*dx1(1).*abs(z1).^nn - gamma1*abs(dx1).*z1.*abs(z1).^(nn-1)))/xy;
+        H0(2*n+i,1) = (A*dx1 - (beta1*dx1(1).*abs(z1).^nn + gamma1*abs(dx1).*z1.*abs(z1).^(nn-1)))/xy;
     end
   
     f0M = Mi*f0;
