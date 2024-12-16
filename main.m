@@ -27,8 +27,8 @@ epx = 1.9*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
-damping = 20*ones(1,ndof);
-stiffness = 200*ones(1,ndof);
+damping = 40*ones(1,ndof);
+stiffness = 400*ones(1,ndof);
 
 % Bouc-Wen parameters
 a_bw = 0.3*ones(1, ndof);
@@ -45,7 +45,7 @@ xy=y0_bw;
 T = 4;
 
 % Barrier:
-lam = 0.7;
+lam = 0.25;
 
 % Time increment for the Monte Carlo simulation.
 dT = 0.0001; %dT = 0.0001;
@@ -61,7 +61,7 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 50;
+ns = 40;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 300;
@@ -74,7 +74,7 @@ run_mcs = true;
 run_fps = true;
 
 % Formulation (optimization, tmdi)
-formulation = "tmdi"; 
+formulation = "optimization"; 
 
 % Base string to save files
 str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_formulation_%s', ...
@@ -220,14 +220,14 @@ fig = figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
-    plot(time, varx_sl(i,:),'k-','linewidth',2) % SL
-    plot(time, c(i,:)','r--','linewidth',2) % ODE
+    plot(time, sqrt(varx_sl(i,:)),'k-','linewidth',2) % SL
+    plot(time, sqrt(c(i,:))','r--','linewidth',2) % ODE
     if run_mcs
-        plot(time_out,varx_mcs(i,:),'b:','linewidth',2) % MCS
+        plot(time_out,sqrt(varx_mcs(i,:)),'b:','linewidth',2) % MCS
     end
     legend('SL', 'SA', 'MCS','interpreter','latex', 'FontSize', 10)
     xlabel('Time','interpreter','latex', 'FontSize', 14)
-    ylabel('$Var[x(t)]$','interpreter','latex', 'FontSize', 14)
+    ylabel('$\sigma[x(t)]$','interpreter','latex', 'FontSize', 14)
     title('Oscillator displacement variance', 'Interpreter', 'latex', 'FontSize', 16)
 end
 
