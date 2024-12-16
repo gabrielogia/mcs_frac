@@ -61,7 +61,7 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 25;
+ns = 50;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 300;
@@ -101,7 +101,7 @@ elseif (oscillator == "bw")
 end
 
 %% Equivalent damping and stiffness
-[omega_eq_2, beta_eq] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, dT, T, time);
+[omega_eq_2, beta_eq] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time);
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
