@@ -1,4 +1,4 @@
-function [omega_eq_2,beta_eq] = get_w2_beta(formulation, ndof, varv_sl, varx_sl,dT,T, time)
+function [omega_eq_2,beta_eq] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time)
     if (formulation == "optimization")
         omega_eq_2 = varv_sl./varx_sl;
         for i=1:ndof
@@ -41,6 +41,8 @@ function [omega_eq_2,beta_eq] = get_w2_beta(formulation, ndof, varv_sl, varx_sl,
             beta_eq(i,:) = interp1(time_out,beq(i,:),time,'pchip');
             omega_eq_2(i,:) = interp1(time_out,w2,time,'pchip');
         end
+
+
     end
 end
 
