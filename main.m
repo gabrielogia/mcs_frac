@@ -61,10 +61,10 @@ end
 fmax_ps = 150; 
 
 % Number of samples in the MCS:
-ns = 40;
+ns = 25;
 
 % Discretization in time and frequency for the Statistical Linearization:
-ntime = 200;
+ntime = 300;
 nfreq = 1000;
 
 % Run MCS:
@@ -73,9 +73,12 @@ run_mcs = true;
 % Find the Survival Probability (Yes=1, No=0):
 run_fps = true;
 
+% Formulation (optimization, tmdi)
+formulation = "tmdi"; 
+
 % Base string to save files
-str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f', ...
-    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness));
+str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_formulation_%s', ...
+    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), formulation);
 
 if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
@@ -98,48 +101,7 @@ elseif (oscillator == "bw")
 end
 
 %% Equivalent damping and stiffness
-omega_eq_2 = varv_sl./varx_sl;
-for i=1:ndof
-    omega_eq_2(i,1) = findfirstpoint(omega_eq_2(i,2),omega_eq_2(i,3));
-
-    for j=1:numel(time)
-        t=time(j);
-        sig2t = varx_sl(i,j);
-
-        Sw = @(x)( evolutionary_power_spectrum(x, t) );
-        Sx = @(x,y)( Sw(x)./( abs(omega_eq_2(i,j) - x.^2 + y*(1i*x).^q).^2 )  );
-        sfun = @(y) ( (sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
-
-        bt = fminbnd(sfun,0.01,1500);
-        beq(i,j)=bt;
-
-    end
-    beq(i,1) = findfirstpoint(beq(i,2),beq(i,3));
-
-    w2 = omega_eq_2(i,:);
-    omega_eq_2(i,:) = w2 + beq(i,:).*w2.^(q).*cos(q*pi/2); 
-    beq(i,:) = beq(i,:).*w2.^(q-1).*sin(q*pi/2); 
-end
-
-beta_eq = beq;
-
-%% TMDI formulation 
-% tt = 0:dT:T;
-% Nrk = 3000;
-% time_out = linspace(tt(1), tt(end), Nrk)';
-% 
-% for i=1:ndof
-%     cx = interp1(time,varx_sl(i,:),time_out,'pchip');
-%     cdx = interp1(time,varv_sl(i,:),time_out,'pchip');
-%     cxdt = gradient(cx,time_out);
-% 
-%     w2 = cdx./cx;
-%     EPS = evolutionary_power_spectrum(sqrt(w2),time_out);
-%     beq(i,:) = (1./cx).*(-cxdt + pi*EPS./w2);
-% 
-%     beta_eq(i,:) = interp1(time_out,beq(i,:),time,'pchip');
-%     omega_eq_2(i,:) = interp1(time_out,w2,time,'pchip');
-% end
+[omega_eq_2, beta_eq] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, dT, T, time);
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
@@ -153,7 +115,8 @@ for i=1:ndof
     beta_eq_dof(1) = findfirstpoint(beta_eq_dof(2),beta_eq_dof(3));
     omega_eq_2_dof(1) = findfirstpoint(omega_eq_2_dof(2),omega_eq_2_dof(3));
 
-    [t, c(i,:)] = ode89(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time,q), time, ic);
+    [t, c(i,:)] = ode89(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time,q, formulation), ...
+        time, ic);
 end
 
 for i=1:ndof
