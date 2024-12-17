@@ -61,7 +61,7 @@ end
 fmax_ps = 50; %with bw: 150; 
 
 % Number of samples in the MCS:
-ns = 500;
+ns = 600;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 300;
@@ -114,6 +114,7 @@ end
 % zlabel('Energy','FontSize', 14, 'Interpreter','latex')
 % colormap jet
 % shading interp
+% save(strcat('data/energy_', str, '.mat'), "time", "energy")
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
@@ -227,7 +228,6 @@ end
 
 saveas(fig, strcat('plots/betaeq_', str, '.pdf'))
 save(strcat('data/betaeq_', str, '.mat'), "time", "beta_eq")
-save(strcat('data/energy_', str, '.mat'), "time", "energy")
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof
