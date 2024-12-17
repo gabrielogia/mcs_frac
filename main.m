@@ -45,7 +45,7 @@ xy=y0_bw;
 T = 4;
 
 % Barrier:
-lam = 0.25;
+lam = 0.75;
 
 % Time increment for the Monte Carlo simulation.
 dT = 0.0001; %dT = 0.0001;
@@ -77,8 +77,8 @@ run_fps = true;
 formulation = "optimization"; 
 
 % Base string to save files
-str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_formulation_%s', ...
-    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), formulation);
+str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_formulation_%s_barrier_%.2f', ...
+    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), formulation, lam);
 
 if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
