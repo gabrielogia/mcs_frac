@@ -61,7 +61,7 @@ end
 fmax_ps = 50; %with bw: 150; 
 
 % Number of samples in the MCS:
-ns = 600;
+ns = 14000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 300;
