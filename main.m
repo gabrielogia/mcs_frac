@@ -10,20 +10,20 @@ tic
 rng(1111);
 
 % Oscillator ('bw', 'duffing')
-oscillator = "bw";
+oscillator = "duffing";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
 nonstat = true;
 
 % Number of DOFs:
-ndof = 3;
+ndof = 1;
 
 % Fractional derivative:
 q = 0.5; 
 
 % Nonlinearity parameter:
-epx = 1.9*ones(1,ndof);
+epx = 0*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
@@ -58,10 +58,10 @@ elseif (oscillator == "bw")
 end
 
 % Maximum frequency of the power spectrum:
-fmax_ps = 150; 
+fmax_ps = 50; %with bw: 150; 
 
 % Number of samples in the MCS:
-ns = 40;
+ns = 500;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 300;
@@ -101,7 +101,19 @@ elseif (oscillator == "bw")
 end
 
 %% Equivalent damping and stiffness
-[omega_eq_2, beta_eq] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time);
+[omega_eq_2, beta_eq, sfun_value] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time);
+
+%% compute energy
+% aux=beta_eq;
+% energy = get_energy(varx_sl, omega_eq_2, aux, ndof, time, q);
+% 
+% fig = figure;
+% surf(omega_eq_2, aux, energy)
+% xlabel('$\omega_{eq}^2(t)$','interpreter','latex', 'FontSize', 14)
+% ylabel('$\beta_{eq}(t)$','interpreter','latex', 'FontSize', 14)
+% zlabel('Energy','FontSize', 14, 'Interpreter','latex')
+% colormap jet
+% shading interp
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
@@ -215,6 +227,7 @@ end
 
 saveas(fig, strcat('plots/betaeq_', str, '.pdf'))
 save(strcat('data/betaeq_', str, '.mat'), "time", "beta_eq")
+save(strcat('data/energy_', str, '.mat'), "time", "energy")
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof
