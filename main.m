@@ -9,6 +9,9 @@ tic
 % For reproducibility:
 rng(1111);
 
+% Power spectrum (wn, eps)
+power_spectrum = "wn";
+
 % Oscillator ('bw', 'duffing')
 oscillator = "duffing";
 
@@ -20,7 +23,7 @@ nonstat = true;
 ndof = 1;
 
 % Fractional derivative:
-q = 0.5; 
+q = 0.999; 
 
 % Nonlinearity parameter:
 epx = 0*ones(1,ndof);
@@ -61,7 +64,7 @@ end
 fmax_ps = 50; %with bw: 150; 
 
 % Number of samples in the MCS:
-ns = 600;
+ns = 1000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 300;
@@ -74,11 +77,11 @@ run_mcs = true;
 run_fps = true;
 
 % Formulation (optimization, tmdi)
-formulation = "optimization"; 
+formulation = "tmdi"; 
 
 % Base string to save files
-str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_formulation_%s', ...
-    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), formulation);
+str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_formulation_%s_powerspectrum_%s', ...
+    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), formulation, power_spectrum);
 
 if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
