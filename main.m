@@ -10,20 +10,20 @@ tic
 rng(1111);
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
 nonstat = true;
 
 % Number of DOFs:
-ndof = 1;
+ndof = 3;
 
 % Fractional derivative:
-q = 0.5; 
+q = 0.75; 
 
 % Nonlinearity parameter:
-epx = 0*ones(1,ndof);
+epx = 1.9*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
@@ -45,7 +45,7 @@ xy=y0_bw;
 T = 4;
 
 % Barrier:
-lam = 0.75;
+lam = 0.50;
 
 % Time increment for the Monte Carlo simulation.
 dT = 0.0001; %dT = 0.0001;
@@ -58,7 +58,7 @@ elseif (oscillator == "bw")
 end
 
 % Maximum frequency of the power spectrum:
-fmax_ps = 50; %with bw: 150; 
+fmax_ps = 150; %duff: 50, bw: 150; 
 
 % Number of samples in the MCS:
 ns = 14000;
