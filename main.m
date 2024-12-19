@@ -20,7 +20,7 @@ nonstat = true;
 ndof = 3;
 
 % Fractional derivative:
-q = 0.75; 
+q = 0.35; 
 
 % Nonlinearity parameter:
 epx = 1.9*ones(1,ndof);
@@ -45,7 +45,7 @@ xy=y0_bw;
 T = 4;
 
 % Barrier:
-lam = 0.50;
+lam = 0.25;
 
 % Time increment for the Monte Carlo simulation.
 dT = 0.0001; %dT = 0.0001;
