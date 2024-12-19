@@ -10,7 +10,7 @@ tic
 rng(1111);
 
 % Power spectrum (wn, eps)
-power_spectrum = "wn";
+power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
 oscillator = "duffing";
@@ -45,13 +45,13 @@ y0_bw = 0.01;
 xy=y0_bw;
 
 % Maximum time:
-T = 4;
+T = 14;
 
 % Barrier:
 lam = 0.25;
 
 % Time increment for the Monte Carlo simulation.
-dT = 0.0001; %dT = 0.0001;
+dT = 1e-4; %dT = 0.0001;
 
 % Construct matrices M, C, and K:
 if (oscillator == "duffing")
@@ -77,7 +77,7 @@ run_mcs = true;
 run_fps = true;
 
 % Formulation (optimization, tmdi)
-formulation = "tmdi"; 
+formulation = "optimization"; 
 
 % Base string to save files
 str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_formulation_%s_powerspectrum_%s', ...
@@ -105,19 +105,6 @@ end
 
 %% Equivalent damping and stiffness
 [omega_eq_2, beta_eq, sfun_value] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time);
-
-%% compute energy
-% aux=beta_eq;
-% energy = get_energy(varx_sl, omega_eq_2, aux, ndof, time, q);
-% 
-% fig = figure;
-% surf(omega_eq_2, aux, energy)
-% xlabel('$\omega_{eq}^2(t)$','interpreter','latex', 'FontSize', 14)
-% ylabel('$\beta_{eq}(t)$','interpreter','latex', 'FontSize', 14)
-% zlabel('Energy','FontSize', 14, 'Interpreter','latex')
-% colormap jet
-% shading interp
-% save(strcat('data/energy_', str, '.mat'), "time", "energy")
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
