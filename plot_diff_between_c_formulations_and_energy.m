@@ -107,13 +107,20 @@ end
 
 %% compute energy diff
 k = 2;
-[sfun,wq2,bq] = get_energy(s2(end),time(end), k*max(stiffness), k*max(damping), q, 1001, 1001);
+[sfun,wq2,bq] = get_energy(s2(end),time(end), omega_eq_2(end), beta_eq(end), q, 101, 101);
 
-fig = figure;
+idx_w2 = find(round(wq2,5)==round(omega_eq_2(end),5));
+idx_beta = find(round(bq,5)==round(beta_eq(end),5));
+
+fig = figure(1);
+xlim([0 max(wq2)])
+ylim([0 max(bq)])
+scatter3(max(stiffness), max(damping), log(sfun(idx_w2, idx_beta)), 50, 'filled')
+hold on
 surf(wq2, bq, log(sfun))
-xlabel('$\omega_{eq}^2(t)$','interpreter','latex', 'FontSize', 14)
-ylabel('$\beta_{eq}(t)$','interpreter','latex', 'FontSize', 14)
-zlabel('Energy','FontSize', 14, 'Interpreter','latex')
+xlabel('$\omega_{eq}^2(t)$')
+ylabel('$\beta_{eq}(t)$')
+zlabel('$\Delta$Energy')
 colormap jet
 shading interp
 
