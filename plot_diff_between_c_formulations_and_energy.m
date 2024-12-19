@@ -115,7 +115,7 @@ idx_beta = find(round(bq,5)==round(beta_eq(end),5));
 fig = figure(1);
 xlim([0 max(wq2)])
 ylim([0 max(bq)])
-scatter3(max(stiffness), max(damping), log(sfun(idx_w2, idx_beta)), 50, 'filled')
+scatter3(max(stiffness), max(damping), log(sfun(idx_w2, idx_beta)), 100, 'filled')
 hold on
 surf(wq2, bq, log(sfun))
 xlabel('$\omega_{eq}^2(t)$')
