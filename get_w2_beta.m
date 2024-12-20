@@ -10,7 +10,7 @@ function [omega_eq_2, beta_eq, sfun_value] = get_w2_beta(formulation, ndof, varv
         
                 Sw = @(x)( evolutionary_power_spectrum(x, t) );
                 Sx = @(x,y)( Sw(x)./( abs(omega_eq_2(i,j) - x.^2 + y*(1i*x).^q).^2 )  );
-                sfun = @(y) ( (sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
+                sfun = @(y) ( log((sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2)  );
 
                 [bt,val] = fminbnd(sfun,0.01,1500);
                 beq(i,j)=bt;
