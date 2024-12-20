@@ -79,6 +79,12 @@ for i=1:ndof
 
     idx_w2 = find(round(wq2,5)==round(omega_eq_2(i,end),5));
     idx_beta = find(round(bq,5)==round(beta_eq(i,end),5));
+
+    data(i).sfun = sfun;
+    data(i).wq2 = wq2;
+    data(i).bq = bq;
+    data(i).idx_w2 = idx_w2;
+    data(i).idx_beta = idx_beta;
     
     fig = figure(3);
     subplot(1,ndof,i)
@@ -94,3 +100,21 @@ for i=1:ndof
     shading interp
     %view([0,90])
 end
+
+%%
+
+figure
+
+for i=1:ndof
+    sfundof = data(i).sfun;
+    subplot(ndof,1,i)
+    hold on
+    plot(bq,log(sfundof(data(i).idx_w2, :)))
+    scatter(bq(data(i).idx_beta),log(sfun(data(i).idx_w2, data(i).idx_beta)),30,'r','filled');
+end
+
+
+
+
+
+

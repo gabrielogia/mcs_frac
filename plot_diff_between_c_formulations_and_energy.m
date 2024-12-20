@@ -112,10 +112,12 @@ k = 2;
 idx_w2 = find(round(wq2,5)==round(omega_eq_2(end),5));
 idx_beta = find(round(bq,5)==round(beta_eq(end),5));
 
+%%
 fig = figure(1);
 xlim([0 max(wq2)])
 ylim([0 max(bq)])
-scatter3(max(stiffness), max(damping), log(sfun(idx_w2, idx_beta)), 100, 'filled')
+%scatter3(max(stiffness), max(damping), log(sfun(idx_w2, idx_beta)), 100, 'filled')
+scatter3(max(stiffness), max(damping), 1000, 100,'r','filled')
 hold on
 surf(wq2, bq, log(sfun))
 xlabel('$\omega_{eq}^2(t)$')
@@ -123,18 +125,26 @@ ylabel('$\beta_{eq}(t)$')
 zlabel('$\Delta$Energy')
 colormap jet
 shading interp
+view([0 90])
+
+
+
+
 
 %% plot omega_eq, beta_eq, and var displacement
 fig = figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
-    plot(time, sqrt(s2(:,i)'),'k-','linewidth',2) % SL
-    plot(time, sqrt(c_integral(i,:))','r--','linewidth',2) % ODE
-    plot(time, sqrt(c_approximation(i,:))','o-','linewidth',1) % ODE
+    
+    %plot(time, sqrt(c_integral(i,:))','ro','linewidth',2) % ODE
+    scatter(time, sqrt(c_integral(i,:)),50,'co');
+    plot(time, sqrt(s2(:,i)'),'r-','linewidth',2) % SL
+    plot(time, sqrt(c_approximation(i,:))','--','linewidth',2) % ODE
     if run_mcs
         plot(time_out,sqrt(varx_mcs(i,:)),'b:','linewidth',2) % MCS
     end
+
     legend('Analytical', 'SA - Integral', 'SA - Approximation', 'MCS')
     xlabel('Time (s)')
     ylabel('$\sigma[x(t)] (m)$')
