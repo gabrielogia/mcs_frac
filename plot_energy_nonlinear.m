@@ -30,8 +30,11 @@ nonstat = true;
 % Number of DOFs:
 ndof = 3;
 
+% Power spectrum mag
+S0 = 0.2;
+
 % Fractional derivative:
-q = 0.5; 
+q = 0.50; 
 
 % Nonlinearity parameter:
 epx = 1*ones(1,ndof);
@@ -39,7 +42,7 @@ epx = 1*ones(1,ndof);
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
 damping = 40*ones(1,ndof);
-stiffness = 400*ones(1,ndof);
+stiffness = 10*damping;
 
 % Bouc-Wen parameters
 a_bw = 0.3*ones(1, ndof);
@@ -82,8 +85,8 @@ nfreq = 1000;
 formulation = "optimization"; 
 
 % Base string to save files
-str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_barrier_%.2f_formulation_%s_powerspectrum_%s', ...
-    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), lam, formulation, power_spectrum);
+str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_barrier_%.2f_formulation_%s_powerspectrum_%s_S0_%.2f', ...
+    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), lam, formulation, power_spectrum, S0);
 
 if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
@@ -98,7 +101,7 @@ load(strcat('data/displacement_variance_', str, '.mat'))
 
 %% compute energy diff
 for i=1:ndof
-    [sfun,wq2,bq] = get_energy(varx_sl(i,end), time(end), omega_eq_2(i,end), beta_eq(i,end), q, 71, 71);
+    [sfun,wq2,bq] = get_energy(varx_sl(i,end), time(end), omega_eq_2(i,end), beta_eq(i,end), q, 71, 71, S0u);
 
     idx_w2 = find(round(wq2,5)==round(omega_eq_2(i,end),5));
     idx_beta = find(round(bq,5)==round(beta_eq(i,end),5));
