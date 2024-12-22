@@ -5,6 +5,15 @@ close all
 files = dir('data/');
 lam = 0.7;
 
+list_factory = fieldnames(get(groot,'factory'));
+index_interpreter = find(contains(list_factory,'Interpreter'));
+for i = 1:length(index_interpreter)
+    default_name = strrep(list_factory{index_interpreter(i)},'factory','default');
+    set(groot, default_name,'latex');
+end
+
+set(groot,'defaultAxesFontSize',12)
+
 %% Equivalent damping and natural frequencies for the same q
 vec_omega = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.20_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00');
 vec_beta = load('data/betaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.20_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00');
@@ -15,46 +24,53 @@ beta_eq = vec_beta.beta_eq;
 
 fig = figure(1);
 subplot(2,1,1)
-plot(time, omega_eq_2', 'linewidth',2)
-xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
-ylabel('$\omega_{eq}^2$  (N/m)','interpreter','latex', 'FontSize', 12)
+plot(time, omega_eq_2(1,:)', '--', 'linewidth',2)
+hold on
+plot(time, omega_eq_2(2,:)', '-.', 'linewidth',2)
+plot(time, omega_eq_2(3,:)', 'linewidth',2)
+xlabel('Time (s)')
+ylabel('$\omega_{eq}^2$  (N/m)')
 %aux = sprintf("System's equivalent stiffness coefficient");
 %title(aux, 'FontSize', 14)
 legend('DOF 1', 'DOF 2', 'DOF 3')
 grid
 
-ax = gca;
-ax.XAxis.FontSize = 12;
-ax.YAxis.FontSize = 12;
-set(gca,'TickLabelInterpreter','latex')
-
 subplot(2,1,2)
-plot(time, beta_eq', 'linewidth',2)
-xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
-ylabel('$\beta_{eq}$ (Ns/m)','interpreter','latex', 'FontSize', 12)
+plot(time, beta_eq(1,:)', '--', 'linewidth',2)
+hold on
+plot(time, beta_eq(2,:)', '-.', 'linewidth',2)
+plot(time, beta_eq(3,:)', 'linewidth',2)
+xlabel('Time (s)')
+ylabel('$\beta_{eq}$ (Ns/m)')
 %aux = sprintf("Oscillator' equivalent damping coefficient");
 %title(aux, 'FontSize', 14)
 legend('DOF 1', 'DOF 2', 'DOF 3', 'Location', 'southeast')
 grid
 
-ax = gca;
-ax.XAxis.FontSize = 12;
-ax.YAxis.FontSize = 12;
-set(gca,'TickLabelInterpreter','latex')
-
-set(fig,'papersize',[6.75 5.0]);
+set(fig,'papersize',[7 5.5]);
 print(fig,'plots/equivalent_stiff_damp_same_q_same_e','-dpdf')
 
-%% Equivalent natural frequency
+%% Equivalent stiffness and damping
 epx = 0.2;
 str1 = 'omegaeq_';
 str2 = sprintf('nonlinearity_%.2f', epx);
+
+markers = ["--", "-.", "-"];
+letters = ["c", "b", "a"];
 
 for i = 1:1:numel(files)
     if(contains(files(i).name, str1) && contains(files(i).name, str2))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
+
+        if (vec(:).q == 0.35)
+            marker = markers(1);
+        elseif (vec(:).q == 0.5)
+            marker = markers(2);
+        else
+            marker = markers(3);
+        end
 
         ndof = size(vec.omega_eq_2);
         ndof = ndof(1);
@@ -64,25 +80,23 @@ for i = 1:1:numel(files)
     
         fig = figure(2);
         for dof = 1:1:ndof
-            subplot(ndof,1,ndof - dof + 1); 
+            subplot(ndof,2, -2*dof + (2*ndof + 1)); 
             hold on
-            plot(time,omega_eq_2(dof,:),'linewidth',2) % MCS
-            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
-            ylabel('$\omega^2_{eq} $ (N/m)','interpreter','latex', 'FontSize', 12)
-            aux = sprintf("DOF: %d", dof);
-            title(aux, 'FontSize', 10)
+            plot(time,omega_eq_2(dof,:), marker, 'linewidth',2) % MCS
+            xlabel('Time (s)')
+            ylabel('$\omega^2_{eq} $ (N/m)')
+            aux = sprintf("%s) DOF %d", letters(dof), dof);
+            title(aux)
             grid;
             legend('q = 0.35', 'q = 0.5', 'q = 0.75')
         end
     end
 end
 
-set(fig,'papersize',[6.75 5.0]);
-print(fig,'plots/equivalent_stiff_different_q','-dpdf')
-
-%% Equivalent damping
 str1 = 'betaeq_';
 str2 = sprintf('nonlinearity_%.2f', epx);
+
+letters = ["f", "e", "d"];
 
 for i = 1:1:numel(files)
     if(contains(files(i).name, str1) && contains(files(i).name, str2))
@@ -90,29 +104,41 @@ for i = 1:1:numel(files)
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
 
+        if (vec(:).q == 0.35)
+            marker = markers(1);
+        elseif (vec(:).q == 0.5)
+            marker = markers(2);
+        else
+            marker = markers(3);
+        end
+
         ndof = size(vec.beta_eq);
         ndof = ndof(1);
 
         time = vec.time;
         beta_eq = vec.beta_eq;
     
-        fig = figure(3);
+        figure(2);
         for dof = 1:1:ndof
-            subplot(ndof,1,ndof - dof + 1); 
+            subplot(ndof,2, -2*(dof - ndof - 1)); 
             hold on
-            plot(time,beta_eq(dof,:),'linewidth',2) % MCS
-            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
-            ylabel('$\beta_{eq} $ (Ns/m)','interpreter','latex', 'FontSize', 12)
-            aux = sprintf("DOF: %d", dof);
-            title(aux, 'FontSize', 10)
+            plot(time,beta_eq(dof,:), marker, 'linewidth',2) % MCS
+            xlabel('Time (s)')
+            ylabel('$\beta_{eq} $ (Ns/m)')
+            aux = sprintf("%s) DOF %d", letters(dof), dof);
+            title(aux)
             grid;
-            legend('q = 0.35', 'q = 0.5', 'q = 0.75')
+            if (dof == 3)
+                legend('q = 0.35', 'q = 0.5', 'q = 0.75', 'Location', 'northwest')
+            else
+                legend('q = 0.35', 'q = 0.5', 'q = 0.75')
+            end
         end
     end
 end
 
-set(fig,'papersize',[6.75 5.4]);
-print(fig,'plots/equivalent_beta_different_q','-dpdf')
+set(fig,'papersize',[8.5 7.5], 'Position',[200 200 700 550]);
+print(fig,'plots/equivalent_stiffness_and_beta_different_q','-dpdf')
 
 %% Plot amplitude PDF
 str1 = 'pdfs_';
@@ -120,6 +146,8 @@ epx = 0.2;
 ndof = 3;
 str2 = sprintf('nonlinearity_%.2f', epx);
 q = 0.50;
+
+letters = ["c" "b" "a" "f" "e" "d"];
 
 for i = 1:1:numel(files)
     if (contains(files(i).name, 'displacement_variance') && contains(files(i).name, str2))
@@ -164,10 +192,10 @@ for i = 1:1:numel(files)
                 clim([0,25])
                 ylim([0,0.4])
                 shading interp
-                xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
-                ylabel('Amplitude (m)','interpreter','latex', 'FontSize', 12)
-                aux = sprintf('MCS PDF. DOF: %d', 3-j+1);
-                title(aux, 'FontSize', 10)
+                xlabel('Time (s)')
+                ylabel('Amplitude (m)')
+                aux = sprintf('%s) MCS PDF. DOF %d', letters(3-j+1), 3-j+1);
+                title(aux)
         
                 subplot(3,2,2*j)
                 hold on
@@ -176,17 +204,17 @@ for i = 1:1:numel(files)
                 clim([0,25])
                 ylim([0,0.4])
                 shading interp
-                xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
-                ylabel('Amplitude (m)','interpreter','latex', 'FontSize', 12)
-                aux = sprintf('Approximate analytical PDF. DOF: %d', 3-j+1);
-                title(aux, 'FontSize', 10)
+                xlabel('Time (s)')
+                ylabel('Amplitude (m)')
+                aux = sprintf('%s) Approximate analytical PDF. DOF: %d', letters(3-j+4), 3-j+1);
+                title(aux)
             end
             break
         end
     end
 end
 
-set(fig,'papersize',[6.75 5.4]);
+set(fig,'papersize',[9.5 7.5], 'Position',[200 200 800 550]);
 print(fig,'plots/amplitude_pdf','-dpdf')
 
 %% survival probability
@@ -204,45 +232,45 @@ for i = 1:1:numel(files)
         time = vec.time;
         fpp = vec.fpp;
         tfp = vec.tfp;
-        T = 20;
+        T = 5;
 
         fig = figure(5);
-        subplot(ndof,3,k); 
+        subplot(ndof,3,4-k); 
         hold on
         plot(time, P(3,:)','k','linewidth',2);
         plot(tfp, fpp,'r--','linewidth',2);
         
-        legend('Analytical','MCS','interpreter','latex')
+        legend('Analytical','MCS')
         aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, 3);
-        title(aux, 'FontSize', 13, 'interpreter','latex')
-        xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
-        ylabel('Survival propability','interpreter','latex', 'FontSize', 12)
+        title(aux)
+        xlabel('Time (s)')
+        ylabel('Survival propability')
         xlim([0 T])
         ylim([0 1])
 
-        subplot(ndof,3,k+3); 
+        subplot(ndof,3,7-k); 
         hold on
         plot(time, P(2,:)','k','linewidth',2);
         plot(tfp, fpp,'r--','linewidth',2);
         
-        legend('Analytical','MCS','interpreter','latex')
+        legend('Analytical','MCS')
         aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, 2);
-        title(aux, 'FontSize', 13, 'interpreter','latex')
-        xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
-        ylabel('Survival propability','interpreter','latex', 'FontSize', 12)
+        title(aux)
+        xlabel('Time (s)')
+        ylabel('Survival propability')
         xlim([0 T])
         ylim([0 1])
 
-        subplot(ndof,3,k+6); 
+        subplot(ndof,3,10-k); 
         hold on
         plot(time, P(1,:)','k','linewidth',2);
         plot(tfp, fpp,'r--','linewidth',2);
         
-        legend('Analytical','MCS','interpreter','latex')
+        legend('Analytical','MCS')
         aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, 1);
-        title(aux, 'FontSize', 13, 'interpreter','latex')
-        xlabel('Time (s)','interpreter','latex', 'FontSize', 12)
-        ylabel('Survival propability','interpreter','latex', 'FontSize', 12)
+        title(aux)
+        xlabel('Time (s)')
+        ylabel('Survival propability')
         xlim([0 T])
         ylim([0 1])
 
@@ -250,19 +278,34 @@ for i = 1:1:numel(files)
     end
 end
 
-set(fig,'papersize',[6.8 5.5]);
+set(fig,'papersize',[9.5 7.5], 'Position',[200 200 800 550]);
 print(fig,'plots/survival_prop','-dpdf')
 
-%% Equivalent natural frequency for diferent non-linearities
+%% Equivalent stiffness and damping for diferent non-linearities
 str1 = 'omegaeq_';
 q = 0.50;
 str2 = sprintf('fractional_%.2f', q);
+
+markers = ["--", "-.", "-"];
+letters = ["c", "b", "a"];
 
 for i = 1:1:numel(files)
     if(contains(files(i).name, str1) && contains(files(i).name, str2))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
-        vec(:).q = str2double(str_split(7));
+        vec(:).epx = str2double(str_split(9));
+
+        if vec(:).epx == 0.2
+            continue
+        end
+
+        if (vec(:).epx == 0.9)
+            marker = markers(1);
+        elseif (vec(:).epx == 1.4)
+            marker = markers(2);
+        else
+            marker = markers(3);
+        end
 
         ndof = size(vec.omega_eq_2);
         ndof = ndof(1);
@@ -270,34 +313,41 @@ for i = 1:1:numel(files)
         time = vec.time;
         omega_eq_2 = vec.omega_eq_2;
     
-        fig = figure(6);
+        fig = figure(4);
         for dof = 1:1:ndof
-            subplot(ndof,1,ndof - dof + 1); 
+            subplot(ndof,2, -2*dof + (2*ndof + 1)); 
             hold on
-            plot(time,omega_eq_2(dof,:),'linewidth',2)
-            grid(1);
-            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
-            ylabel('$\omega^2_{eq}$ (N/m)','interpreter','latex', 'FontSize', 12)
-            aux = sprintf('DOF: %d', dof);
-            title(aux, 'FontSize', 10)
-            legend('\epsilon = 0.20', '\epsilon = 0.90', '\epsilon = 1.40', '\epsilon = 2.20')
+            plot(time,omega_eq_2(dof,:), marker, 'linewidth',2) % MCS
+            xlabel('Time (s)')
+            ylabel('$\omega^2_{eq} $ (N/m)')
+            aux = sprintf("%s) DOF %d", letters(dof), dof);
+            title(aux)
+            grid
+            legend('$\epsilon$ = 0.90', '$\epsilon$ = 1.40', '$\epsilon$ = 2.20')
         end
     end
 end
 
-set(fig,'papersize',[7 5.3]);
-print(fig,'plots/equivalent_stiff_different_epi','-dpdf')
-
-%% Equivalent damping for diferent non-linearities
 str1 = 'betaeq_';
-q = 0.50;
-str2 = sprintf('fractional_%.2f', q);
+letters = ["f", "e", "d"];
 
 for i = 1:1:numel(files)
     if(contains(files(i).name, str1) && contains(files(i).name, str2))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
-        vec(:).q = str2double(str_split(7));
+        vec(:).epx = str2double(str_split(7));
+
+        if round(vec(:).epx,1) == 0.2
+            continue
+        end
+
+        if (vec(:).epx == 0.9)
+            marker = markers(1);
+        elseif (vec(:).epx == 1.4)
+            marker = markers(2);
+        else
+            marker = markers(3);
+        end
 
         ndof = size(vec.beta_eq);
         ndof = ndof(1);
@@ -305,17 +355,17 @@ for i = 1:1:numel(files)
         time = vec.time;
         beta_eq = vec.beta_eq;
     
-        fig = figure(7);
+        figure(4);
         for dof = 1:1:ndof
-            subplot(ndof,1,ndof - dof + 1); 
+            subplot(ndof,2, -2*(dof - ndof - 1)); 
             hold on
-            plot(time,beta_eq(dof,:),'linewidth',2) % MCS
-            grid(1);
-            xlabel('Time (s)', 'interpreter','latex', 'FontSize', 12)
-            ylabel('$\beta_{eq}$ (Ns/m)','interpreter','latex', 'FontSize', 12)
-            aux = sprintf('DOF: %d', dof);
-            title(aux, 'FontSize', 10)
-            legend('\epsilon = 0.20', '\epsilon = 0.90', '\epsilon = 1.40', '\epsilon = 2.20', 'Location', 'southeast')
+            plot(time,beta_eq(dof,:), marker, 'linewidth',2) % MCS
+            grid
+            xlabel('Time (s)')
+            ylabel('$\beta_{eq} $ (Ns/m)')
+            aux = sprintf("%s) DOF %d", letters(dof), dof);
+            title(aux)
+            legend('$\epsilon$ = 0.90', '$\epsilon$ = 1.40', '$\epsilon$ = 2.20', 'Location', 'southeast')
         end
     end
 end

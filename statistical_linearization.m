@@ -1,6 +1,6 @@
 function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
     statistical_linearization(m, c, k, M, C, K, freq,...
-    time, ndof, epx, q, is_base)
+    time, ndof, epx, q, is_base, S0)
 
     Mt = M;
     tol = 1e-6;
@@ -45,7 +45,7 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
                 f = freq(j);
                 H = get_H(f,Mt,Ct,Kt, q);
                 
-                ps = evolutionary_power_spectrum(f, t);
+                ps = evolutionary_power_spectrum(f, t, S0);
 
                 E_ps = ps*M_ps;
                 result = real(H*E_ps*H');

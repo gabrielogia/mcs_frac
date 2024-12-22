@@ -8,10 +8,12 @@ t_max = 30;
 freq = 0:0.1:freq_max;
 time = 0:0.1:t_max;
 
+S0 = 1;
+
 eps = zeros(numel(freq), numel(time));
 for i=1:1:numel(freq)
     for j = 1:1:numel(time)
-        eps(i,j) = evolutionary_power_spectrum(freq(i), time(j));
+        eps(i,j) = evolutionary_power_spectrum(freq(i), time(j), S0);
     end
 end
 
