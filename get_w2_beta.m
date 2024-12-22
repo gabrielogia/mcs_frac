@@ -25,7 +25,7 @@ function [beq, sfun_value] = optimize(time, i, varx_sl, w2, q, S0)
         Sx = @(x,y)( Sw(x)./( abs(w2(j) - x.^2 + y*(1i*x).^q).^2 )  );
         sfun = @(y) ( log((sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2)  );
 
-        [bt,val] = fminbnd(sfun,0.01,150);
+        [bt,val] = fminunc(sfun,40);
 
         beq(j)=bt;
         sfun_value(j)=val;

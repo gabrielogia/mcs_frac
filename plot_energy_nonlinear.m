@@ -101,7 +101,7 @@ load(strcat('data/displacement_variance_', str, '.mat'))
 
 %% compute energy diff
 for i=1:ndof
-    [sfun,wq2,bq] = get_energy(varx_sl(i,end), time(end), omega_eq_2(i,end), beta_eq(i,end), q, 71, 71, S0u);
+    [sfun,wq2,bq] = get_energy(varx_sl(i,end), time(end), omega_eq_2(i,end), beta_eq(i,end), q, 71, 71, S0);
 
     idx_w2 = find(round(wq2,5)==round(omega_eq_2(i,end),5));
     idx_beta = find(round(bq,5)==round(beta_eq(i,end),5));

@@ -155,6 +155,8 @@ save(strcat('data/mcs/mcs_', str, '.mat'), "varx_mcs", "time_out", "first_passag
 %% First passage
 [first_passage_time,amplitude] = time_failure(response,velocity,barrier,omega_eq_2,time_out,time);
 
+amplitude = abs(amplitude);
+
 am = shiftdim(amplitude,1);
 amax = max(am(:));
 av = linspace(0,amax,20);
