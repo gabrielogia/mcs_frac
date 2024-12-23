@@ -83,32 +83,10 @@ if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
 end
 
-%% load mcs previous results
-if exist(strcat('data/mcs/mcs_', str, '.mat'))
-    load(strcat('data/mcs/mcs_', str, '.mat'))
-    run_mcs = false;
-else
-    run_mcs = true;
-end
-
-%% Statistical Linearization
-disp(["Running Statistical Linearization:" oscillator])
-
-time = linspace(1e-3, T, ntime);
-
-if (oscillator == "duffing")
-    omega_n = sqrt(eig(inv(M)*K));
-    freq = linspace(0,fmax_ps,nfreq);
-    
-    [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
-    statistical_linearization(mass, damping, stiffness, M, C, K, freq, time, ndof, epx, q, is_base, S0);
-elseif (oscillator == "bw")
-    [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
-    statistical_linearization_bw(M, C, K, time, A_bw, gamma_bw, beta_bw, fmax_ps, nfreq, q, xy, S0);
-end
-
-%% Equivalent damping and stiffness
-[omega_eq_2, beta_eq, beta_original, w2] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time, S0);
+%% load simulation results
+load(strcat('data/displacement_variance_', str, '.mat'))
+load(strcat('data/betaeq_', str, '.mat'))
+load(strcat('data/omegaeq_', str, '.mat'))
 
 %% compute energy diff
 for i=1:ndof
