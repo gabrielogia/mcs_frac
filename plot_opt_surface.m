@@ -3,16 +3,7 @@ clc
 clear
 close all
 
-list_factory = fieldnames(get(groot,'factory'));
-index_interpreter = find(contains(list_factory,'Interpreter'));
-for i = 1:length(index_interpreter)
-    default_name = strrep(list_factory{index_interpreter(i)},'factory','default');
-    set(groot, default_name,'latex');
-end
-
-set(groot,'defaultAxesFontSize',12)
-
-%% Structure data
+%% Structure data 
 
 % For reproducibility:
 rng(1111);
@@ -92,21 +83,42 @@ if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
 end
 
-%% Equivalent damping and stiffness
-load(strcat('data/omegaeq_', str, '.mat'));
-load(strcat('data/betaeq_', str, '.mat'));
+%% load mcs previous results
+if exist(strcat('data/mcs/mcs_', str, '.mat'))
+    load(strcat('data/mcs/mcs_', str, '.mat'))
+    run_mcs = false;
+else
+    run_mcs = true;
+end
 
-%% load montecarlo simulation
-load(strcat('data/displacement_variance_', str, '.mat'))
+%% Statistical Linearization
+disp(["Running Statistical Linearization:" oscillator])
+
+time = linspace(1e-3, T, ntime);
+
+if (oscillator == "duffing")
+    omega_n = sqrt(eig(inv(M)*K));
+    freq = linspace(0,fmax_ps,nfreq);
+    
+    [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
+    statistical_linearization(mass, damping, stiffness, M, C, K, freq, time, ndof, epx, q, is_base, S0);
+elseif (oscillator == "bw")
+    [varx_sl, varv_sl, conv, k_eq, c_eq] = ...
+    statistical_linearization_bw(M, C, K, time, A_bw, gamma_bw, beta_bw, fmax_ps, nfreq, q, xy, S0);
+end
+
+%% Equivalent damping and stiffness
+[omega_eq_2, beta_eq, beta_original, w2] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time, S0);
 
 %% compute energy diff
 for i=1:ndof
-    [sfun,wq2,bq] = get_energy(varx_sl(i,end), time(end), omega_eq_2(i,end), beta_eq(i,end), q, 71, 71, S0);
+    [sfun_values,wq2,bq] = get_integral_values_mesh(varx_sl(i,end), time(end), w2(i,end), ...
+        beta_original(i,end), q, 51, 51, S0);
 
-    idx_w2 = find(round(wq2,5)==round(omega_eq_2(i,end),5));
-    idx_beta = find(round(bq,5)==round(beta_eq(i,end),5));
+    idx_w2 = find(round(wq2,5)==round(w2(i,end),5));
+    idx_beta = find(round(bq,5)==round(beta_original(i,end),5));
 
-    data(i).sfun = sfun;
+    data(i).sfun_values = sfun_values;
     data(i).wq2 = wq2;
     data(i).bq = bq;
     data(i).idx_w2 = idx_w2;
@@ -116,9 +128,9 @@ for i=1:ndof
     subplot(1,ndof,i)
     xlim([0 max(wq2)])
     ylim([0 max(bq)])
-    scatter3(omega_eq_2(i,end), beta_eq(i,end), (sfun(idx_w2, idx_beta)), 100, 'filled')
+    scatter3(wq2(idx_w2), bq(idx_beta), log(sfun_values(idx_w2, idx_beta)), 100, 'filled')
     hold on
-    surf(wq2, bq, (sfun))
+    surf(wq2, bq, log(sfun_values))
     xlabel('$\omega_{eq}^2(t)$')
     ylabel('$\beta_{eq}(t)$')
     zlabel('$\Delta$Energy')
@@ -132,14 +144,12 @@ saveas(fig, strcat('plots/3ddeltasigma_', str, '.pdf'))
 %%
 fig = figure(2);
 for i=1:ndof
-    sfundof = data(i).sfun;
+    sfun_values = data(i).sfun_values;
+    bq = data(i).bq;
     subplot(ndof,1,i)
     hold on
-    plot(bq,(sfundof(data(i).idx_w2, :)))
-    scatter(bq(data(i).idx_beta),(sfun(data(i).idx_w2, data(i).idx_beta)),30,'r','filled');
+    plot(bq,log(sfun_values(data(i).idx_w2, :)))
+    scatter(bq(data(i).idx_beta),log(sfun_values(data(i).idx_w2, data(i).idx_beta)),30,'r','filled');
 end
 
 saveas(fig, strcat('plots/2ddeltasigma_', str, '.pdf'))
-
-
-

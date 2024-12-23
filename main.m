@@ -108,7 +108,7 @@ elseif (oscillator == "bw")
 end
 
 %% Equivalent damping and stiffness
-[omega_eq_2, beta_eq] = get_w2_beta(ndof, varv_sl, varx_sl, q, time, S0);
+[omega_eq_2, beta_eq, beta_original, w2] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time, S0);
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
@@ -213,7 +213,7 @@ for i=1:ndof
 end
 
 saveas(fig, strcat('plots/omegaeq_', str, '.pdf'))
-save(strcat('data/omegaeq_', str, '.mat'), "time", "omega_eq_2")
+save(strcat('data/omegaeq_', str, '.mat'), "time", "omega_eq_2", "w2")
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof
@@ -226,7 +226,7 @@ for i=1:ndof
 end
 
 saveas(fig, strcat('plots/betaeq_', str, '.pdf'))
-save(strcat('data/betaeq_', str, '.mat'), "time", "beta_eq")
+save(strcat('data/betaeq_', str, '.mat'), "time", "beta_eq", "beta_original")
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof

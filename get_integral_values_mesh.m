@@ -1,4 +1,4 @@
-function [sfun,weq2,beq] = get_energy(s2t,t,weq2_center,beta_center,q,nw,nb,S0)
+function [sfun_values,weq2,beq] = get_integral_values_mesh(s2t,t,weq2_center,beta_center,q,nw,nb,S0)
     init = 0.01;
     k = 2.5;
 
@@ -22,11 +22,13 @@ function [sfun,weq2,beq] = get_energy(s2t,t,weq2_center,beta_center,q,nw,nb,S0)
         cond = (size(beq) < size(weq2));
     end
 
+    sfun_values = zeros(numel(weq2), numel(beq));
+
     for k=1:numel(weq2)
         w2 = weq2(k);
         parfor j=1:numel(beq)
-            Sw = @(x)( evolutionary_power_spectrum(x, t, S0) );
-            sfun(k,j) = log(abs(s2t - 2*integral(@(x)Sw(x)./( abs(w2 - x.^2 + beq(j)*(1i*x).^q).^2 ),0,Inf)).^2);
+            beta_eq = beq(j);
+            sfun_values(k,j) = sfun(s2t, w2, t, S0, q, beta_eq)
         end
     end
 end
