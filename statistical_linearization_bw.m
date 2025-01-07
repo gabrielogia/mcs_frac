@@ -1,4 +1,4 @@
-function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, K, time, A, gamma1, beta1, fmax_ps, nfreq, q,xy)
+function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, K, time, A, gamma1, beta1, fmax_ps, nfreq, q,xy, S0)
 
     tol=1e-6;
     maxiter = 30;
@@ -49,7 +49,7 @@ function [var_x, var_v, conv, ktime, ctime] =statistical_linearization_bw(M, C, 
                 auz = zeros(ndof,1);
 
                 for jj = 1:ndof
-                    ps = evolutionary_power_spectrum(f, t);
+                    ps = evolutionary_power_spectrum(f, t, S0);
 
                     aux = aux + (2*ps*abs(H(1:ndof, jj)).^2);
                     auz = auz + (2*ps*abs(H(1+ndof:2*ndof, jj)).^2);

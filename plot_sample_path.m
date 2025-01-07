@@ -9,12 +9,13 @@ time = 0:0.01:T;
 m=800;
 frequency_max = 50;
 dw = frequency_max/m;
+S0 = 1;
 
 W = zeros(numel(time),n_paths);
 
 for path = 1:1:n_paths
     for ii=0:m-1
-        eps_fun = evolutionary_power_spectrum(ii*dw,time);
+        eps_fun = evolutionary_power_spectrum(ii*dw,time,S0);
         W(:,path) = W(:,path) + (((4*dw.*eps_fun).^0.5).*cos((ii*dw).*time - (2*pi)*rand))'; 
     end
 end

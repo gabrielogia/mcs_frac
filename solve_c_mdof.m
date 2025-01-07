@@ -1,9 +1,9 @@
-function dc = solve_c_mdof(t, c, beta, omega0, time,q,formulation)
+function dc = solve_c_mdof(t, c, beta, omega0, time,q,formulation, S0)
     beta_eq = interp1(time, beta, t);
 
     omega_eq_2 = interp1(time, omega0, t);
 
-    Sw = @(x)( evolutionary_power_spectrum(x, t) );
+    Sw = @(x)( evolutionary_power_spectrum(x, t, S0) );
     
     if (formulation == "optimization")
         Sx = @(x)( Sw(x)./( (omega_eq_2 - x.^2).^2 + (beta_eq*x).^2 ) );

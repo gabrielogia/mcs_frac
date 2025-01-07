@@ -1,6 +1,6 @@
 function [vx,time_out,first_passage_time,state,velo,amplitude] = ...
     monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,nonstat,...
-    is_base, T, dT, bar) 
+    is_base, T, dT, bar, S0) 
 
     Mi = inv(M);
     MiC = Mi*C;
@@ -8,7 +8,7 @@ function [vx,time_out,first_passage_time,state,velo,amplitude] = ...
     ndof = size(M,1);
     
     for i=1:ndof
-        EPS{i}.fun = @(f,t)( evolutionary_power_spectrum(f, t) );
+        EPS{i}.fun = @(f,t)( evolutionary_power_spectrum(f, t, S0) );
     end
     
     tt = 0:dT:T;

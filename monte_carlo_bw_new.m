@@ -1,5 +1,5 @@
 function [vx,time_out,first_passage_time,state,velo, hyst, amplitude] = monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat, ...
-                                                                           is_base, T, dT, bar, ndof, A, gamma1, beta1,xy) 
+                                                                           is_base, T, dT, bar, ndof, A, gamma1, beta1,xy, S0) 
     Ms = M(1:ndof,1:ndof);
     Cs = C(1:ndof,1:ndof);
     Ka = K(1:ndof,1:ndof);
@@ -13,7 +13,7 @@ function [vx,time_out,first_passage_time,state,velo, hyst, amplitude] = monte_ca
 
     % Excitation Power Spectrum:
     for i=1:ndof
-        EPS{i}.fun = @(f,t)( evolutionary_power_spectrum(f, t) );
+        EPS{i}.fun = @(f,t)( evolutionary_power_spectrum(f, t, S0) );
     end
     
     %MCS
