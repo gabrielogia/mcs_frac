@@ -282,15 +282,18 @@ set(fig,'papersize',[9.5 7.5], 'Position',[200 200 800 550]);
 print(fig,'plots/survival_prop','-dpdf')
 
 %% Equivalent stiffness and damping for diferent non-linearities
+str0 = 'duffing';
 str1 = 'omegaeq_';
 q = 0.50;
 str2 = sprintf('fractional_%.2f', q);
+str3 = sprintf('mcssamples_%d', 12000);
 
 markers = ["--", "-.", "-"];
 letters = ["c", "b", "a"];
 
 for i = 1:1:numel(files)
-    if(contains(files(i).name, str1) && contains(files(i).name, str2))
+    if(contains(files(i).name, str0) && contains(files(i).name, str1) ...
+            && contains(files(i).name, str2) && contains(files(i).name, str3))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).epx = str2double(str_split(9));
@@ -332,10 +335,11 @@ str1 = 'betaeq_';
 letters = ["f", "e", "d"];
 
 for i = 1:1:numel(files)
-    if(contains(files(i).name, str1) && contains(files(i).name, str2))
+    if(contains(files(i).name, str0) && contains(files(i).name, str1) ...
+            && contains(files(i).name, str2) && contains(files(i).name, str3))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
-        vec(:).epx = str2double(str_split(7));
+        vec(:).epx = str2double(str_split(9));
 
         if round(vec(:).epx,1) == 0.2
             continue
@@ -370,8 +374,8 @@ for i = 1:1:numel(files)
     end
 end
 
-set(fig,'papersize',[7 5.3]);
-print(fig,'plots/equivalent_damping_different_epi','-dpdf')
+set(fig,'papersize',[8.5 7.5], 'Position',[200 200 700 550]);
+print(fig,'plots/equivalent_stiffines_and_damping_different_epi','-dpdf')
 
 %%
 a = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.20_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00.mat');
