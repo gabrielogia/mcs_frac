@@ -45,7 +45,7 @@ xy=y0_bw;
 T = 4;
 
 % Barrier:
-lam = 0.25;
+lam = 0.75;
 
 % Time increment for the Monte Carlo simulation.
 dT = 0.0001; %dT = 0.0001;
