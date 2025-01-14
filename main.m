@@ -12,7 +12,7 @@ rng(1111);
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.50; 
+q = 0.999; 
 
 % Nonlinearity parameter:
 epx = 1*ones(1,ndof);
@@ -50,7 +50,7 @@ xy=y0_bw;
 T = 4;
 
 % Barrier:
-lam = 0.75;
+lam = 0.25;
 
 % Time increment for the Monte Carlo simulation.
 dT = 1e-3;
@@ -66,7 +66,7 @@ end
 fmax_ps = 50; %with bw: 150; 
 
 % Number of samples in the MCS:
-ns = 1000;
+ns = 14000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
@@ -199,7 +199,7 @@ ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
 title('Analytical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
 
 saveas(fig, strcat('plots/pdfs_', str, '.pdf'))
-save(strcat('data/pdfs_', str, '.mat'), "time_out", "av", "pr", "pa")
+save(strcat('data/pdfs_', str, '.mat'), "time_out", "av", "pr", "pa", "bar", "ha")
 
 %% plot omega_eq, beta_eq, and var displacement
 fig = figure('color',[1 1 1]);
