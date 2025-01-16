@@ -12,7 +12,7 @@ rng(1111);
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "bw";
+oscillator = "duffing";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -47,7 +47,7 @@ y0_bw = 0.01;
 xy=y0_bw;
 
 % Maximum time:
-T = 10;
+T = 4;
 
 % Barrier:
 lam = 0.25;
