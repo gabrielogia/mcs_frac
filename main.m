@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.50; 
+q = 0.5; 
 
 % Nonlinearity parameter:
 epx = 1*ones(1,ndof);
@@ -36,7 +36,7 @@ damping = 40*ones(1,ndof);
 stiffness = 10*damping;
 
 % Bouc-Wen parameters
-a_bw = 1*ones(1, ndof);
+a_bw = 0.3*ones(1, ndof);
 A_bw = 1;
 beta_bw = 0.5;
 gamma_bw = 0.5;
@@ -72,15 +72,14 @@ ns = 14000;
 ntime = 200;
 nfreq = 1000;
 
-% Formulation (optimization, tmdi)
-formulation = "optimization"; 
-
 % Base string to save files
-str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_barrier_%.2f_formulation_%s_powerspectrum_%s_S0_%.2f', ...
-    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), lam, formulation, power_spectrum, S0);
+str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_barrier_%.2f_powerspectrum_%s_S0_%.2f', ...
+    oscillator, ndof, q, dT, ns, max(damping), max(stiffness), lam, power_spectrum, S0);
 
 if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
+else
+    str = strcat(str, sprintf('_duffingparameter_epx_%.2f', max(epx)));
 end
 
 %% load mcs previous results
@@ -159,7 +158,7 @@ amplitude = abs(amplitude);
 
 am = shiftdim(amplitude,1);
 amax = max(am(:));
-av = linspace(0,amax,20);
+av = linspace(0,amax,200);
 ntdim=numel(time_out);
 
 for i=1:ndof
@@ -168,6 +167,17 @@ for i=1:ndof
         [pp,xx]=ksdensity(am(j,:,i),av);
         pr(:,j,i)=pp';
         pa(:,j,i)= ((av./cint).*exp(-(av.^2)./(2*cint) ))';
+    end
+end
+
+%%
+figure
+for i=1:ndof
+    subplot(ndof,1,i)
+    hold on
+    for j=[150 1500 2500]
+        plot(av,pr(:,j,i),'k','linewidth',2);
+        plot(av,pa(:,j,i),'--r','linewidth',2)
     end
 end
 
