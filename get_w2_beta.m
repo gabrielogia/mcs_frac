@@ -7,21 +7,24 @@ function [omega_eq_2, beta_eq, beta_original, omega_2_original] = get_w2_beta(fo
         for j=1:numel(time)
             t=time(j);
             sig2t = varx_sl(i,j);
-    
-            % Sw = @(x)( evolutionary_power_spectrum(x, t, S0) );
-            % Sx = @(x,y)( Sw(x)./( abs(omega_eq_2(i,j) - x.^2 + y*(1i*x).^q).^2 )  );
-            % sfun = @(y) ( abs(sig2t - 2*integral(@(x)Sx(x,y),0,Inf)).^2  );
 
             omega_eq_2_i_j = omega_eq_2(i,j);
 
             bt = fminbnd(@(y) (sfun(sig2t, omega_eq_2_i_j, t, S0, q, y)), 0.01,1500);
             beq_original(i,j)=bt;
+
         end
         beq_original(i,1) = findfirstpoint(beq_original(i,2),beq_original(i,3));
-    
         w2 = omega_eq_2(i,:);
-        omega_eq_2(i,:) = w2 + beq_original(i,:).*w2.^(q).*cos(q*pi/2); 
-        beq(i,:) = beq_original(i,:).*w2.^(q-1).*sin(q*pi/2);
+
+        w = sqrt(w2);
+        I1 = (time.^(1-q)./(1-q)).*hypergeom(0.5-q/2,[0.5 1.5-q/2],-0.25*w2.*time.^2);
+        I2 = (time.^(2-q).*w./(2-q)).*hypergeom(1-q/2,[1.5 2-q/2],-0.25*w2.*time.^2);
+        corC = beq_original(i,:).*I1./gamma(1-q);
+        corK = beq_original(i,:).*(w.*I2)./gamma(1-q);
+
+        omega_eq_2(i,:) = w2+corK; 
+        beq(i,:) = corC;
 
         beta_original(i,:) = beq_original(i,:);
         omega_2_original(i,:) = w2;
