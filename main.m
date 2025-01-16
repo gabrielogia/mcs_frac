@@ -47,7 +47,7 @@ y0_bw = 0.01;
 xy=y0_bw;
 
 % Maximum time:
-T = 4;
+T = 11;
 
 % Barrier:
 lam = 0.25;
