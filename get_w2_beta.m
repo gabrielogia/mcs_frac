@@ -1,4 +1,4 @@
-function [omega_eq_2, beta_eq, beta_original, omega_2_original] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time, S0)
+function [omega_eq_2, beta_eq, beta_original, omega_2_original] = get_w2_beta(ndof, varv_sl, varx_sl, q, dT, T, time, S0)
     omega_eq_2 = varv_sl./varx_sl;
 
     for i=1:ndof

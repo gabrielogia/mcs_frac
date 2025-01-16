@@ -47,7 +47,7 @@ y0_bw = 0.01;
 xy=y0_bw;
 
 % Maximum time:
-T = 4;
+T = 10;
 
 % Barrier:
 lam = 0.25;
@@ -107,7 +107,7 @@ elseif (oscillator == "bw")
 end
 
 %% Equivalent damping and stiffness
-[omega_eq_2, beta_eq, beta_original, w2] = get_w2_beta(formulation, ndof, varv_sl, varx_sl, q, dT, T, time, S0);
+[omega_eq_2, beta_eq, beta_original, w2] = get_w2_beta(ndof, varv_sl, varx_sl, q, dT, T, time, S0);
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
@@ -121,7 +121,7 @@ for i=1:ndof
     beta_eq_dof(1) = findfirstpoint(beta_eq_dof(2),beta_eq_dof(3));
     omega_eq_2_dof(1) = findfirstpoint(omega_eq_2_dof(2),omega_eq_2_dof(3));
 
-    [t, c(i,:)] = ode89(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time,q, formulation, S0), time, ic);
+    [t, c(i,:)] = ode89(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time,q, S0), time, ic);
 end
 
 for i=1:ndof
