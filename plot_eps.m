@@ -55,5 +55,5 @@ ax.YAxis.FontSize = 12;
 set(gca,'TickLabelInterpreter','latex')
 
 %saveas(fig, 'plots/eps', 'pdf')
-set(fig,'papersize',[7 5.0]);
+set(fig,'papersize',[7 5.8]);
 print(fig,'plots/eps','-dpdf')

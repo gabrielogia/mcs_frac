@@ -30,8 +30,6 @@ plot(time, omega_eq_2(3,:)', 'linewidth',2)
 xlabel('Time (s)')
 ylabel('$\omega_{eq}^2$  (N/m)')
 xlim([0 11])
-%aux = sprintf("System's equivalent stiffness coefficient");
-%title(aux, 'FontSize', 14)
 legend('DOF 1', 'DOF 2', 'DOF 3')
 grid
 
@@ -43,8 +41,6 @@ plot(time, beta_eq(3,:)', 'linewidth',2)
 xlabel('Time (s)')
 ylabel('$\beta_{eq}$ (Ns/m)')
 xlim([0 11])
-%aux = sprintf("Oscillator' equivalent damping coefficient");
-%title(aux, 'FontSize', 14)
 legend('DOF 1', 'DOF 2', 'DOF 3', 'Location', 'southeast')
 grid
 
@@ -300,15 +296,12 @@ for i = 1:1:numel(files)
             && contains(files(i).name, str2) && contains(files(i).name, str3))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
-        vec(:).epx = str2double(str_split(9));
+        str_split = strsplit(string(str_split(24)), ".mat");
+        vec(:).epx = str2double(str_split(1));
 
-        if vec(:).epx == 0.2
-            continue
-        end
-
-        if (vec(:).epx == 0.9)
+        if (vec(:).epx == 0.50)
             marker = markers(1);
-        elseif (vec(:).epx == 1.4)
+        elseif (vec(:).epx == 1.00)
             marker = markers(2);
         else
             marker = markers(3);
@@ -343,15 +336,12 @@ for i = 1:1:numel(files)
             && contains(files(i).name, str2) && contains(files(i).name, str3))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
-        vec(:).epx = str2double(str_split(9));
+        str_split = strsplit(string(str_split(24)), ".mat");
+        vec(:).epx = str2double(str_split(1));
 
-        if round(vec(:).epx,1) == 0.2
-            continue
-        end
-
-        if (vec(:).epx == 0.9)
+        if (vec(:).epx == 0.50)
             marker = markers(1);
-        elseif (vec(:).epx == 1.4)
+        elseif (vec(:).epx == 1.00)
             marker = markers(2);
         else
             marker = markers(3);
@@ -381,48 +371,23 @@ end
 set(fig,'papersize',[8.5 7.5], 'Position',[200 200 700 550]);
 print(fig,'plots/equivalent_stiffines_and_damping_different_epi','-dpdf')
 
-%%
-a = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.20_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00.mat');
-b = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.90_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00.mat');
-c = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_1.40_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00.mat');
-q = 0.5;
+%% displacement same q and same ep
+load('data/displacement_variance_oscillator_duffing_ndof_3_fractional_0.75_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_duffingparameter_epx_1.00.mat')
 
-figure;
-subplot(3,1,1)
-hold on
-dof = 3;
-plot(a.time, a.omega_eq_2(dof,:),'linewidth',2);
-plot(a.time, b.omega_eq_2(dof,:),'linewidth',2);
-plot(a.time, c.omega_eq_2(dof,:),'linewidth',2);
-xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-ylabel('$\omega^2_{eq}(t) $ (rad/s)','interpreter','latex', 'FontSize', 14)
-legend('$\epsilon = 0.20$', '$\epsilon = 0.90$', '$\epsilon = 1.40$', 'interpreter','latex', 'FontSize', 13)
-aux = sprintf('Oscillator equivalent natural frequency. DOF: %d; Fractional: %.2f', dof, q);
-title(aux, 'FontSize', 14)
-grid;
+fig = figure;
+for i=1:ndof
+    subplot(ndof,1,i); 
+    hold on
+    plot(time, sqrt(varx_sl(i,:)),'k-','linewidth',2) % SL
+    plot(time, sqrt(c(i,:))','r--','linewidth',2) % ODE
+    plot(time_out,sqrt(varx_mcs(i,:)),'b:','linewidth',2) % MCS
+    legend('SL', 'SA', 'MCS', 'Location', 'southeast')
+    xlabel('Time (s)')
+    ylabel('$\sigma[x(t)] (m)$')
+    xlim([0 11])
+    aux = sprintf("DOF %d", i);
+    title(aux)
+end
 
-subplot(3,1,2)
-hold on
-dof = 2;
-plot(a.time, a.omega_eq_2(dof,:),'linewidth',2);
-plot(a.time, b.omega_eq_2(dof,:),'linewidth',2);
-plot(a.time, c.omega_eq_2(dof,:),'linewidth',2);
-xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-ylabel('$\omega^2_{eq}(t) $ (rad/s)','interpreter','latex', 'FontSize', 14)
-legend('$\epsilon = 0.20$', '$\epsilon = 0.90$', '$\epsilon = 1.40$', 'interpreter','latex', 'FontSize', 13)
-aux = sprintf('Oscillator equivalent natural frequency. DOF: %d; Fractional: %.2f', dof, q);
-title(aux, 'FontSize', 14)
-grid;
-
-subplot(3,1,3)
-hold on
-dof = 1;
-plot(a.time, a.omega_eq_2(dof,:),'linewidth',2);
-plot(a.time, b.omega_eq_2(dof,:),'linewidth',2);
-plot(a.time, c.omega_eq_2(dof,:),'linewidth',2);
-xlabel('Time (s)', 'interpreter','latex', 'FontSize', 14)
-ylabel('$\omega^2_{eq}(t) $ (rad/s)','interpreter','latex', 'FontSize', 14)
-legend('$\epsilon = 0.20$', '$\epsilon = 0.90$', '$\epsilon = 1.40$', 'interpreter','latex', 'FontSize', 13)
-aux = sprintf('Oscillator equivalent natural frequency. DOF: %d; Fractional: %.2f', dof, q);
-title(aux, 'FontSize', 14)
-grid;
+set(fig,'papersize',[8.5 7.5], 'Position',[200 200 700 550]);
+print(fig,'plots/displacement_std_same_q_same_epx','-dpdf')
