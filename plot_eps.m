@@ -2,13 +2,22 @@ clc
 clear
 close all
 
+list_factory = fieldnames(get(groot,'factory'));
+index_interpreter = find(contains(list_factory,'Interpreter'));
+for i = 1:length(index_interpreter)
+    default_name = strrep(list_factory{index_interpreter(i)},'factory','default');
+    set(groot, default_name,'latex');
+end
+
+set(groot,'defaultAxesFontSize',12)
+
 freq_max = 100;
 t_max = 30;
 
 freq = 0:0.1:freq_max;
 time = 0:0.1:t_max;
 
-S0 = 1;
+S0 = 0.2;
 
 eps = zeros(numel(freq), numel(time));
 for i=1:1:numel(freq)
@@ -46,5 +55,5 @@ ax.YAxis.FontSize = 12;
 set(gca,'TickLabelInterpreter','latex')
 
 %saveas(fig, 'plots/eps', 'pdf')
-set(fig,'papersize',[6.75 5.0]);
+set(fig,'papersize',[7 5.0]);
 print(fig,'plots/eps','-dpdf')

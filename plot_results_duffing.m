@@ -3,7 +3,6 @@ clear
 close all
 
 files = dir('data/');
-lam = 0.7;
 
 list_factory = fieldnames(get(groot,'factory'));
 index_interpreter = find(contains(list_factory,'Interpreter'));
@@ -15,8 +14,8 @@ end
 set(groot,'defaultAxesFontSize',12)
 
 %% Equivalent damping and natural frequencies for the same q
-vec_omega = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.20_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00');
-vec_beta = load('data/betaeq_oscillator_duffing_ndof_3_fractional_0.50_nonlinearity_0.20_dt_0.0010_mcssamples_12000_damping_20.00_stiffness_200.00');
+vec_omega = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.50_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_duffingparameter_epx_1.00');
+vec_beta = load('data/betaeq_oscillator_duffing_ndof_3_fractional_0.50_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_duffingparameter_epx_1.00');
 
 time = vec_omega.time;
 omega_eq_2 = vec_omega.omega_eq_2;
@@ -30,6 +29,7 @@ plot(time, omega_eq_2(2,:)', '-.', 'linewidth',2)
 plot(time, omega_eq_2(3,:)', 'linewidth',2)
 xlabel('Time (s)')
 ylabel('$\omega_{eq}^2$  (N/m)')
+xlim([0 11])
 %aux = sprintf("System's equivalent stiffness coefficient");
 %title(aux, 'FontSize', 14)
 legend('DOF 1', 'DOF 2', 'DOF 3')
@@ -42,6 +42,7 @@ plot(time, beta_eq(2,:)', '-.', 'linewidth',2)
 plot(time, beta_eq(3,:)', 'linewidth',2)
 xlabel('Time (s)')
 ylabel('$\beta_{eq}$ (Ns/m)')
+xlim([0 11])
 %aux = sprintf("Oscillator' equivalent damping coefficient");
 %title(aux, 'FontSize', 14)
 legend('DOF 1', 'DOF 2', 'DOF 3', 'Location', 'southeast')
@@ -51,9 +52,9 @@ set(fig,'papersize',[7 5.5]);
 print(fig,'plots/equivalent_stiff_damp_same_q_same_e','-dpdf')
 
 %% Equivalent stiffness and damping
-epx = 0.2;
+epx = 1;
 str1 = 'omegaeq_';
-str2 = sprintf('nonlinearity_%.2f', epx);
+str2 = sprintf('epx_%.2f', epx);
 
 markers = ["--", "-.", "-"];
 letters = ["c", "b", "a"];
@@ -89,12 +90,12 @@ for i = 1:1:numel(files)
             title(aux)
             grid;
             legend('q = 0.35', 'q = 0.5', 'q = 0.75')
+            xlim([0 11])
         end
     end
 end
 
 str1 = 'betaeq_';
-str2 = sprintf('nonlinearity_%.2f', epx);
 
 letters = ["f", "e", "d"];
 
@@ -133,6 +134,7 @@ for i = 1:1:numel(files)
             else
                 legend('q = 0.35', 'q = 0.5', 'q = 0.75')
             end
+            xlim([0 11])
         end
     end
 end
@@ -141,10 +143,11 @@ set(fig,'papersize',[8.5 7.5], 'Position',[200 200 700 550]);
 print(fig,'plots/equivalent_stiffness_and_beta_different_q','-dpdf')
 
 %% Plot amplitude PDF
+lam = 0.25;
 str1 = 'pdfs_';
-epx = 0.2;
+epx = 1;
 ndof = 3;
-str2 = sprintf('nonlinearity_%.2f', epx);
+str2 = sprintf('epx_%.2f', epx);
 q = 0.50;
 
 letters = ["c" "b" "a" "f" "e" "d"];
@@ -189,8 +192,9 @@ for i = 1:1:numel(files)
                 hold on
                 surf(time_out,av,pr(:,:,3-j+1));
                 plot3(time_out,ones(size(time_out))*barrier(3-j+1),ha,'r','linewidth',2)
-                clim([0,25])
-                ylim([0,0.4])
+                clim([0,150])
+                ylim([0,max(av)])
+                xlim([0 11])
                 shading interp
                 xlabel('Time (s)')
                 ylabel('Amplitude (m)')
@@ -201,8 +205,9 @@ for i = 1:1:numel(files)
                 hold on
                 surf(time_out,av,pa(:,:,3-j+1));
                 plot3(time_out,ones(size(time_out))*barrier(3-j+1),ha,'r','linewidth',2)
-                clim([0,25])
-                ylim([0,0.4])
+                clim([0,150])
+                ylim([0,max(av)])
+                xlim([0 11])
                 shading interp
                 xlabel('Time (s)')
                 ylabel('Amplitude (m)')
@@ -218,7 +223,6 @@ set(fig,'papersize',[9.5 7.5], 'Position',[200 200 800 550]);
 print(fig,'plots/amplitude_pdf','-dpdf')
 
 %% survival probability
-close all
 str1 = 'firsttimepassage_';
 
 k = 1;
@@ -232,7 +236,7 @@ for i = 1:1:numel(files)
         time = vec.time;
         fpp = vec.fpp;
         tfp = vec.tfp;
-        T = 5;
+        T = 2;
 
         fig = figure(5);
         subplot(ndof,3,4-k); 
@@ -286,7 +290,7 @@ str0 = 'duffing';
 str1 = 'omegaeq_';
 q = 0.50;
 str2 = sprintf('fractional_%.2f', q);
-str3 = sprintf('mcssamples_%d', 12000);
+str3 = sprintf('mcssamples_%d', 14000);
 
 markers = ["--", "-.", "-"];
 letters = ["c", "b", "a"];
@@ -326,7 +330,7 @@ for i = 1:1:numel(files)
             aux = sprintf("%s) DOF %d", letters(dof), dof);
             title(aux)
             grid
-            legend('$\epsilon$ = 0.90', '$\epsilon$ = 1.40', '$\epsilon$ = 2.20')
+            legend('$\epsilon$ = 0.50', '$\epsilon$ = 1.00', '$\epsilon$ = 2.00')
         end
     end
 end
@@ -369,7 +373,7 @@ for i = 1:1:numel(files)
             ylabel('$\beta_{eq} $ (Ns/m)')
             aux = sprintf("%s) DOF %d", letters(dof), dof);
             title(aux)
-            legend('$\epsilon$ = 0.90', '$\epsilon$ = 1.40', '$\epsilon$ = 2.20', 'Location', 'southeast')
+            legend('$\epsilon$ = 0.50', '$\epsilon$ = 1.00', '$\epsilon$ = 2.00', 'Location', 'southeast')
         end
     end
 end
