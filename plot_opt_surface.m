@@ -34,10 +34,10 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.50; 
+q = 0.50;
 
 % Nonlinearity parameter:
-epx = 1*ones(1,ndof);
+epx = 1.0*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
@@ -45,7 +45,7 @@ damping = 40*ones(1,ndof);
 stiffness = 10*damping;
 
 % Bouc-Wen parameters
-a_bw = 0.3*ones(1, ndof);
+a_bw = 0.5*ones(1, ndof);
 A_bw = 1;
 beta_bw = 0.5;
 gamma_bw = 0.5;
@@ -56,7 +56,7 @@ y0_bw = 0.01;
 xy=y0_bw;
 
 % Maximum time:
-T = 4;
+T = 11;
 
 % Barrier:
 lam = 0.25;
@@ -75,21 +75,20 @@ end
 fmax_ps = 50; %with bw: 150; 
 
 % Number of samples in the MCS:
-ns = 1000;
+ns = 14000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 200;
 nfreq = 1000;
 
-% Formulation (optimization, tmdi)
-formulation = "optimization"; 
-
 % Base string to save files
-str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_nonlinearity_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_barrier_%.2f_formulation_%s_powerspectrum_%s_S0_%.2f', ...
-    oscillator, ndof, q, max(epx), dT, ns, max(damping), max(stiffness), lam, formulation, power_spectrum, S0);
+str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_barrier_%.2f_powerspectrum_%s_S0_%.2f', ...
+    oscillator, ndof, q, dT, ns, max(damping), max(stiffness), lam, power_spectrum, S0);
 
 if (oscillator == "bw")
     str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
+else
+    str = strcat(str, sprintf('_duffingparameter_epx_%.2f', max(epx)));
 end
 
 %% load simulation results
