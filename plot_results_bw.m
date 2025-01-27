@@ -11,7 +11,7 @@ for i = 1:length(index_interpreter)
     set(groot, default_name,'latex');
 end
 
-set(groot,'defaultAxesFontSize',12)
+set(groot,'defaultAxesFontSize', 16)
 
 %% Equivalent damping and natural frequencies for the same q
 vec_omega = load('data/omegaeq_oscillator_bw_ndof_3_fractional_0.50_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_bwparameters_a_0.30_A_1.00_beta_0.50_gamma_0.50_xy_0.01');
@@ -22,7 +22,7 @@ omega_eq_2 = vec_omega.omega_eq_2;
 beta_eq = vec_beta.beta_eq;
 
 fig = figure(1);
-subplot(2,1,1)
+subplot(1,2,1)
 plot(time, omega_eq_2(1,:)', '--', 'linewidth',2)
 hold on
 plot(time, omega_eq_2(2,:)', '-.', 'linewidth',2)
@@ -30,10 +30,11 @@ plot(time, omega_eq_2(3,:)', 'linewidth',2)
 xlabel('Time (s)')
 ylabel('$\omega_{eq}^2$  (N/m)')
 xlim([0 11])
+title("a)")
 legend('DOF 1', 'DOF 2', 'DOF 3')
 grid
 
-subplot(2,1,2)
+subplot(1,2,2)
 plot(time, beta_eq(1,:)', '--', 'linewidth',2)
 hold on
 plot(time, beta_eq(2,:)', '-.', 'linewidth',2)
@@ -41,11 +42,12 @@ plot(time, beta_eq(3,:)', 'linewidth',2)
 xlabel('Time (s)')
 ylabel('$\beta_{eq}$ (Ns/m)')
 xlim([0 11])
+title("b)")
 legend('DOF 1', 'DOF 2', 'DOF 3', 'Location', 'southeast')
 grid
 
-set(fig,'papersize',[7 5.5]);
-print(fig,'plots/equivalent_stiff_damp_same_q_same_e_bw','-dpdf')
+set(fig,'papersize',[6 5.5], 'Position', [200 200 900 350]);
+print(fig,'plots/equivalent_stiff_damp_same_q_same_e_bw','-dpng','-r1000')
 
 %% Equivalent stiffness and damping
 a = 0.50;
@@ -63,7 +65,6 @@ for i = 1:1:numel(files)
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
-        files(i).name
 
         if (vec(:).q == 0.35)
             marker = markers(1);
@@ -139,8 +140,8 @@ for i = 1:1:numel(files)
     end
 end
 
-set(fig,'papersize',[8.5 7.5], 'Position',[200 200 700 550]);
-print(fig,'plots/equivalent_stiffness_and_beta_different_q_bw','-dpdf')
+set(fig,'papersize',[7.5 7.0], 'Position',[200 200 900 550]);
+print(fig,'plots/equivalent_stiffness_and_beta_different_q_bw','-dpng','-r1000')
 
 %% Plot amplitude PDF
 lam = 0.25;
@@ -188,15 +189,15 @@ for i = 1:1:numel(files)
             ha = ones(size(time_out))*1000;
 
             for j = 1:1:ndof
-                fig = figure(4);
+                fig = figure(3);
                 colormap jet
                 subplot(3,2,2*j-1)
                 hold on
                 surf(time_out,av,pr(:,:,3-j+1));
                 plot3(time_out,ones(size(time_out))*barrier(3-j+1),ha,'r','linewidth',2)
-                clim([0,180])
-                ylim([0,max(av)])
-                xlim([0 11])
+                clim([0,200])
+                ylim([0,0.05])
+                xlim([0 4])
                 shading interp
                 xlabel('Time (s)')
                 ylabel('Amplitude (m)')
@@ -207,9 +208,9 @@ for i = 1:1:numel(files)
                 hold on
                 surf(time_out,av,pa(:,:,3-j+1));
                 plot3(time_out,ones(size(time_out))*barrier(3-j+1),ha,'r','linewidth',2)
-                clim([0,180])
-                ylim([0,max(av)])
-                xlim([0 11])
+                clim([0,200])
+                ylim([0,0.05])
+                xlim([0 4])
                 shading interp
                 xlabel('Time (s)')
                 ylabel('Amplitude (m)')
@@ -221,8 +222,8 @@ for i = 1:1:numel(files)
     end
 end
 
-set(fig,'papersize',[9.5 7.5], 'Position',[200 200 800 550]);
-print(fig,'plots/amplitude_pdf_bw','-dpdf')
+set(fig,'papersize',[7.5 7.0], 'Position',[200 200 900 550]);
+print(fig,'plots/amplitude_pdf_bw','-dpng','-r1000')
 
 %% survival probability
 str1 = 'firsttimepassage_';
@@ -243,7 +244,7 @@ for i = 1:1:numel(files)
         tfp = vec.tfp;
         T = 2;
 
-        fig = figure(5);
+        fig = figure(4);
         subplot(ndof,3,4-k); 
         hold on
         plot(time, P(3,:)','k','linewidth',2);
@@ -287,8 +288,8 @@ for i = 1:1:numel(files)
     end
 end
 
-set(fig,'papersize',[9.5 7.5], 'Position',[200 200 800 550]);
-print(fig,'plots/survival_prop_bw','-dpdf')
+set(fig,'papersize',[7.5 7.0], 'Position',[200 200 900 550]);
+print(fig,'plots/survival_prop_bw','-dpng','-r1000')
 
 %% Equivalent stiffness and damping for diferent non-linearities
 str0 = 'bw';
@@ -323,7 +324,7 @@ for i = 1:1:numel(files)
         time = vec.time;
         omega_eq_2 = vec.omega_eq_2;
     
-        fig = figure(4);
+        fig = figure(5);
         for dof = 1:1:ndof
             subplot(ndof,2, -2*dof + (2*ndof + 1)); 
             hold on
@@ -363,7 +364,7 @@ for i = 1:1:numel(files)
         time = vec.time;
         beta_eq = vec.beta_eq;
     
-        figure(4);
+        figure(5);
         for dof = 1:1:ndof
             subplot(ndof,2, -2*(dof - ndof - 1)); 
             hold on
@@ -378,13 +379,13 @@ for i = 1:1:numel(files)
     end
 end
 
-set(fig,'papersize',[8.5 7.5], 'Position',[200 200 700 550]);
-print(fig,'plots/equivalent_stiffines_and_damping_different_epi_bw','-dpdf')
+set(fig,'papersize',[7.5 7.0], 'Position',[200 200 900 550]);
+print(fig,'plots/equivalent_stiffines_and_damping_different_epi_bw','-dpng','-r1000')
 
 %% displacement same q and same ep
 load('data/displacement_variance_oscillator_bw_ndof_3_fractional_0.50_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_bwparameters_a_0.50_A_1.00_beta_0.50_gamma_0.50_xy_0.01')
 
-fig = figure;
+fig = figure(6);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
@@ -399,5 +400,5 @@ for i=1:ndof
     title(aux)
 end
 
-set(fig,'papersize',[8.5 7.5], 'Position',[200 200 700 550]);
-print(fig,'plots/displacement_std_same_q_same_epx_bw','-dpdf')
+set(fig,'papersize',[7.5 7.0], 'Position',[200 200 900 450]);
+print(fig,'plots/displacement_std_same_q_same_epx_bw','-dpng','-r1000')

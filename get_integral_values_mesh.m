@@ -1,14 +1,15 @@
 function [sfun_values,weq2,beq] = get_integral_values_mesh(s2t,t,weq2_center,beta_center,q,nw,nb,S0)
-    init = 0.01;
-    k = 2.5;
+    k = 0.04;
+    L = weq2_center*(1-k);
+    H = weq2_center*(1+k);
+    weq2 = L:(H - L)/nw:H;
+    weq2(numel(weq2)/2) = weq2_center;
 
-    L = init  + rem(weq2_center - init, (weq2_center - init)/nw);
-    H = weq2_center*k - rem(weq2_center*k - weq2_center, (weq2_center*k - weq2_center)/nw);
-    weq2 = L:(weq2_center - init)/nw:H;
-
-    L = init  + rem(beta_center - init, (beta_center - init)/nb);
-    H = beta_center*k - rem(beta_center*k - beta_center, (beta_center*k - beta_center)/nb);
-    beq = L:(beta_center - init)/nb:H;
+    k = 0.07;
+    L = beta_center*(1-k);
+    H = beta_center*(1+k);
+    beq = L:(H - L)/nb:H;
+    beq(numel(beq)/2) = beta_center;
 
     cond = (size(beq) > size(weq2));
     while cond(2)

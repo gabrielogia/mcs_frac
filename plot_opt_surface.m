@@ -3,6 +3,7 @@ clc
 clear
 close all
 
+%% plot settings
 list_factory = fieldnames(get(groot,'factory'));
 index_interpreter = find(contains(list_factory,'Interpreter'));
 for i = 1:length(index_interpreter)
@@ -10,7 +11,7 @@ for i = 1:length(index_interpreter)
     set(groot, default_name,'latex');
 end
 
-set(groot,'defaultAxesFontSize',12)
+set(groot,'defaultAxesFontSize',14)
 
 %% Structure data 
 
@@ -121,51 +122,39 @@ for i=1:1
     idx_beta = data(i).idx_beta;
 
     fig = figure(1);
-    subplot(1,1,i)
-    xlim([0 max(wq2)])
-    ylim([0 max(bq)])
-    zlim([log(min(min(sfun_values))) log(max(max(sfun_values)))])
+    subplot(2,1,i)
+    xlim([min(wq2) max(wq2)])
+    ylim([min(bq) max(bq)])
+    zlim([(min(min(sfun_values))) (max(max(sfun_values)))])
 
-    scatter3(wq2(idx_w2), bq(idx_beta), log(sfun_values(idx_w2, idx_beta)), 100, 'filled')
+    scatter3(wq2(idx_w2), bq(idx_beta), (sfun_values(idx_w2, idx_beta)), 100, 'r', 'filled')
     hold on
-    surf(wq2, bq, log(sfun_values))
-    % aux = sprintf('%s) DOF %d', letters(i), i);
-    % title(aux)
-    view([18,10])
-    %plot3(wq2(idx_w2)*ones(1,1000), linspace(0,max(bq),1000), log(sfun_values(idx_w2, idx_beta))*ones(1,1000), 'r--', 'LineWidth', 2)
-    %plot3(linspace(0,max(wq2),1000), bq(idx_beta)*ones(1,1000), log(sfun_values(idx_w2, idx_beta))*ones(1,1000), 'k--', 'LineWidth', 2)
+    surf(wq2, bq, (sfun_values))
+    view([15.38, 10.793])
+    title('a)')
 
-    ax = gca;
-    ax.ZMinorTick = 'on';
-    ax.ZAxis.TickValues = linspace(log(min(min(sfun_values))), log(max(max(sfun_values))), log(200));
+    colormap jet
+    shading interp
 
     xlabel('$\omega_{eq}^2(t)$')
     ylabel('$\beta_{eq}(t)$')
-    zlabel('$log(\Delta\sigma^2)$')
-    colormap jet
-    shading interp
+    zlabel('$\Delta c(t)$')
 end
 
-set(fig,'papersize',[10.5 5.5], 'position', [0 0 800 400]);
-print(fig,'plots/3ddeltasigma','-dpdf')
-
-%%
-fig = figure(2);
 for i=1:1
     sfun_values = data(i).sfun_values;
     bq = data(i).bq;
-    subplot(1,1,i)
-    hold on
+
+    subplot(2,1,i+1)
     plot(bq,(sfun_values(data(i).idx_w2, :)))
-    scatter(bq(data(i).idx_beta),(sfun_values(data(i).idx_w2, data(i).idx_beta)),50,'r','filled');
-    set(gca, 'YScale', 'log')
-    % aux = sprintf('%s) DOF %d', letters(i), i);
-    % title(aux)
+    hold on
+    scatter(bq(data(i).idx_beta),(sfun_values(data(i).idx_w2, data(i).idx_beta)),100, 'r', 'filled');
+    ylabel('$\Delta c(t)$')
     xlabel('$\beta_{eq}(t)$')
-    ylabel('$log(\Delta\sigma^2)$')
-    xlim([0, max(bq)])
+    xlim([min(bq), max(bq)])
+    title('b)')
     grid
 end
 
-set(fig,'papersize',[9.5 4.3], 'position', [0 0 750 300]);
-print(fig,'plots/2ddeltasigma','-dpdf')
+set(fig,'papersize',[10 6.5], 'position', [0 0 800 500]);
+print(fig,'plots/3ddeltasigma','-dpdf')
