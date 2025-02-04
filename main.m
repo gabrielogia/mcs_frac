@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.35; 
+q = 0.50; 
 
 % Nonlinearity parameter:
 epx = 1.5*ones(1,ndof);
@@ -258,7 +258,7 @@ save(strcat('data/displacement_variance_', str, '.mat'), "time", "varx_sl", "c",
 cfp=c;
 
 bt = beta_eq;
-P_new=survival_probability_3(barrier,cfp,time,10,bt,omega_eq_2,stiffness,12, S0);
+P_new=survival_probability_3(barrier,cfp,time,10,bt,omega_eq_2,stiffness, 20, S0);
 load('data/firsttimepassage_oscillator_bw_ndof_3_fractional_0.35_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_bwparameters_a_0.70_A_1.00_beta_0.50_gamma_0.50_xy_0.01')
 
 fig = figure('color',[1 1 1]);
