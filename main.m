@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.50; 
+q = 0.75; 
 
 % Nonlinearity parameter:
 epx = 1.5*ones(1,ndof);
@@ -258,8 +258,9 @@ save(strcat('data/displacement_variance_', str, '.mat'), "time", "varx_sl", "c",
 cfp=c;
 
 bt = beta_eq;
-P_new=survival_probability_3(barrier,cfp,time,10,bt,omega_eq_2,stiffness, 20, S0);
-load('data/firsttimepassage_oscillator_bw_ndof_3_fractional_0.35_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_bwparameters_a_0.70_A_1.00_beta_0.50_gamma_0.50_xy_0.01')
+P_new_one_integral = survival_probability_3(barrier,cfp,time,10,bt,omega_eq_2,stiffness, 15, S0, true);
+P_new_ioannis = survival_probability_3(barrier,cfp,time,10,bt,omega_eq_2,stiffness, 15, S0, false);
+load('data/firsttimepassage_oscillator_bw_ndof_3_fractional_0.75_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_bwparameters_a_0.70_A_1.00_beta_0.50_gamma_0.50_xy_0.01')
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof
@@ -268,10 +269,11 @@ for i=1:ndof
     [fpp,tfp]=ksdensity(fpt,'width',0.1,'Function','survivor');
     subplot(ndof,1,ndof-i+1); 
     hold on
-    plot(time, P(i,:)','g','linewidth',2);
-    plot(time, P_new(i,:)','b','linewidth',2);
+    plot(time, P(i,:)','g-','linewidth',2);
+    plot(time, P_new_one_integral(i,:)','c-','linewidth',2);
+    plot(time, P_new_ioannis(i,:)','b.','linewidth',2);
     plot(tfp, fpp,'r--','linewidth',2);
-    legend('Analytical - OLD', 'Analytical - NEW', 'MCS')
+    legend('Analytical - OLD', 'Analytical - ONE INTEGRAL', 'Analytical - IOANNIS', 'MCS')
 
     title(i)
     xlabel('Time')
