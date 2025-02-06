@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.75; 
+q = 0.50; 
 
 % Nonlinearity parameter:
 epx = 1.5*ones(1,ndof);
@@ -63,13 +63,13 @@ elseif (oscillator == "bw")
 end
 
 % Maximum frequency of the power spectrum:
-fmax_ps = 50; %with bw: 150; 
+fmax_ps = 50;
 
 % Number of samples in the MCS:
 ns = 14000;
 
 % Discretization in time and frequency for the Statistical Linearization:
-ntime = 200;
+ntime = 400;
 nfreq = 1000;
 
 % Base string to save files
@@ -107,13 +107,15 @@ elseif (oscillator == "bw")
 end
 
 %% Equivalent damping and stiffness
-[omega_eq_2, beta_eq, beta_original, w2] = get_w2_beta(ndof, varv_sl, varx_sl, q, dT, T, time, S0);
+disp(["Getting omega and beta."]);
+[omega_eq_2, beta_eq, beta_original, w2] = get_w2_beta(ndof, varv_sl, varx_sl, q, dT, T, time, S0, false);
 
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
 
 ic = 0.00000001;
 c = zeros(ndof, numel(time));
+
 for i=1:ndof
     beta_eq_dof = beta_eq(i,:);
     omega_eq_2_dof = omega_eq_2(i,:);
@@ -147,11 +149,14 @@ if run_mcs
         monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw, xy, S0);
     end
     toc
+
+    save(strcat('data/mcs/mcs_', str, '.mat'), "varx_mcs", "time_out", "first_passage_time", "response", "velocity", "amplitude")
+else
+    disp('Jumping MCS')
 end
 
-save(strcat('data/mcs/mcs_', str, '.mat'), "varx_mcs", "time_out", "first_passage_time", "response", "velocity", "amplitude")
-
 %% First passage
+disp('Getting first passage')
 [first_passage_time,amplitude] = time_failure(response,velocity,barrier,omega_eq_2,time_out,time);
 
 amplitude = abs(amplitude);
@@ -170,18 +175,9 @@ for i=1:ndof
     end
 end
 
-%%
-figure
-for i=1:ndof
-    subplot(ndof,1,i)
-    hold on
-    for j=[150 1500 2500]
-        plot(av,pr(:,j,i),'k','linewidth',2);
-        plot(av,pa(:,j,i),'--r','linewidth',2)
-    end
-end
-
 %% plot pdf surface
+disp('plotting pdf surface')
+
 bar = ones(size(time_out))*barrier(1);
 ha = ones(size(time_out))*1000;
 
@@ -193,6 +189,7 @@ shading interp
 plot3(time_out,bar,ha,'r','linewidth',2)
 view([0,90])
 clim([0,200])
+xlim([0 4])
 xlabel('Time','interpreter','latex', 'FontSize', 14)
 ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
 title('Empirical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
@@ -204,6 +201,7 @@ shading interp
 plot3(time_out,bar,ha,'r','linewidth',2)
 view([0,90])
 clim([0,200])
+xlim([0 4])
 xlabel('Time','interpreter','latex', 'FontSize', 14)
 ylabel('Amplitude','interpreter','latex', 'FontSize', 14)
 title('Analytical probability density function', 'Interpreter', 'latex', 'FontSize', 16)
@@ -212,11 +210,14 @@ saveas(fig, strcat('plots/pdfs_', str, '.pdf'))
 save(strcat('data/pdfs_', str, '.mat'), "time_out", "av", "pr", "pa", "bar", "ha")
 
 %% plot omega_eq, beta_eq, and var displacement
+disp('Plotting omega, beta, and displacement')
+
 fig = figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
-    plot(time,omega_eq_2(i,:),'linewidth',2) % MCS
+    plot(time,omega_eq_2(i,:),'linewidth',2)
+    xlim([0 4])
     xlabel('Time','interpreter','latex', 'FontSize', 14)
     ylabel('$\omega^2_{eq}(t)$','interpreter','latex', 'FontSize', 14)
     title('Oscillator equivalent natural frequency', 'Interpreter', 'latex', 'FontSize', 16)
@@ -230,6 +231,7 @@ for i=1:ndof
     subplot(ndof,1,i); 
     hold on
     plot(time, beta_eq(i,:),'linewidth',2)
+    xlim([0 4])
     xlabel('Time','interpreter','latex', 'FontSize', 14)
     ylabel('$\beta_{eq}(t)$','interpreter','latex', 'FontSize', 14)
     title('Oscillator equivalent damping', 'Interpreter', 'latex', 'FontSize', 16)
@@ -242,9 +244,10 @@ fig = figure('color',[1 1 1]);
 for i=1:ndof
     subplot(ndof,1,i); 
     hold on
-    plot(time, sqrt(varx_sl(i,:)),'k-','linewidth',2) % SL
-    plot(time, sqrt(c(i,:))','r--','linewidth',2) % ODE
-    plot(time_out,sqrt(varx_mcs(i,:)),'b:','linewidth',2) % MCS
+    plot(time, sqrt(varx_sl(i,:)),'k-','linewidth',2)
+    plot(time, sqrt(c(i,:))','r--','linewidth',2)
+    plot(time_out,sqrt(varx_mcs(i,:)),'b:','linewidth',2)
+    xlim([0 4])
     legend('SL', 'SA', 'MCS','interpreter','latex', 'FontSize', 10)
     xlabel('Time','interpreter','latex', 'FontSize', 14)
     ylabel('$\sigma[x(t)]$','interpreter','latex', 'FontSize', 14)
@@ -255,10 +258,8 @@ saveas(fig, strcat('plots/displacement_variance_', str, '.pdf'))
 save(strcat('data/displacement_variance_', str, '.mat'), "time", "varx_sl", "c", "time_out", "varx_mcs")
 
 %% Survival Probability
-cfp=c;
-
 bt = beta_eq;
-P=survival_probability_3(barrier,cfp,time,10,bt,omega_eq_2,stiffness,12);
+P = survival_probability(barrier, c, time, numel(time), bt, omega_eq_2, 15, S0);
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof
@@ -267,14 +268,14 @@ for i=1:ndof
     [fpp,tfp]=ksdensity(fpt,'width',0.1,'Function','survivor');
     subplot(ndof,1,ndof-i+1); 
     hold on
-    plot(time, P(i,:)','k','linewidth',2);
+    plot(time, P(i,:)','b','linewidth',2);
     plot(tfp, fpp,'r--','linewidth',2);
+    legend('Analytical', 'MCS')
 
-    legend('Analytical','MCS','interpreter','latex')
     title(i)
     xlabel('Time')
     ylabel('Survival Propability')
-    xlim([0 T])
+    xlim([0 4])
     ylim([0 1])
 end
 
