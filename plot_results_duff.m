@@ -13,42 +13,6 @@ end
 
 set(groot,'defaultAxesFontSize',16)
 
-%% Equivalent damping and natural frequencies for the same q
-vec_omega = load('data/omegaeq_oscillator_duffing_ndof_3_fractional_0.75_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_duffingparameter_epx_1.00');
-vec_beta = load('data/betaeq_oscillator_duffing_ndof_3_fractional_0.75_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_duffingparameter_epx_1.00');
-
-time = vec_omega.time;
-omega_eq_2 = vec_omega.omega_eq_2;
-beta_eq = vec_beta.beta_eq;
-
-fig = figure(1);
-subplot(1,2,1)
-plot(time, omega_eq_2(1,:)', '--', 'linewidth',2)
-hold on
-plot(time, omega_eq_2(2,:)', '-.', 'linewidth',2)
-plot(time, omega_eq_2(3,:)', 'linewidth',2)
-xlabel('Time (s)')
-ylabel('$\omega_{e}^2$  (N/m)')
-xlim([0 4])
-title("a) Effective time-varying stiffness")
-legend('DOF 1', 'DOF 2', 'DOF 3')
-grid
-
-subplot(1,2,2)
-plot(time, beta_eq(1,:)', '--', 'linewidth',2)
-hold on
-plot(time, beta_eq(2,:)', '-.', 'linewidth',2)
-plot(time, beta_eq(3,:)', 'linewidth',2)
-xlabel('Time (s)')
-ylabel('$\beta_{e}$ (Ns/m)')
-xlim([0 4])
-title("b) Effective time-varying damping")
-legend('DOF 1', 'DOF 2', 'DOF 3')
-grid
-
-set(fig,'papersize',[6.0 5.5], 'Position', [200 200 900 350]);
-print(fig,'plots/equivalent_stiff_damp_same_q_same_e','-dpng','-r1000')
-
 %% Equivalent stiffness and damping
 epx = 1;
 str1 = 'omegaeq_';
@@ -79,6 +43,7 @@ for i = 1:1:numel(files)
     
         fig = figure(2);
         if (marker ~= "")
+            vec(:).q
             for dof = 1:1:ndof
                 subplot(2,ndof, dof); 
                 hold on
@@ -86,10 +51,11 @@ for i = 1:1:numel(files)
                 xlabel('Time (s)')
                 ylabel('$\omega^2_{e} $ (N/m)')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
-                title(aux)
-                grid(1);
+                title(aux,'FontSize',18)
+                grid("on");
                 xlim([0 4])
                 ylim([0 1500])
+                xticks([0 1 2 3 4])
                 legend('q = 0.5', 'q = 0.75')
             end
         end
@@ -128,11 +94,13 @@ for i = 1:1:numel(files)
                 xlabel('Time (s)')
                 ylabel('$\beta_{e} $ (Ns/m)')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
-                title(aux)
-                grid(1);
+                title(aux, 'FontSize',18)
+                grid("on");
                 xlim([0 4])
-                ylim([0 40])
-                legend('q = 0.5', 'q = 0.75')
+                xticks([0 1 2 3 4])
+                ylim([0 50])
+                yticks([0 25 50])
+                legend('q = 0.5', 'q = 0.75', 'location', 'north')
             end
         end
     end
