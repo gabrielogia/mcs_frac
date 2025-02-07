@@ -9,7 +9,7 @@ for i = 1:length(index_interpreter)
     set(groot, default_name,'latex');
 end
 
-set(groot,'defaultAxesFontSize',12)
+set(groot,'defaultAxesFontSize', 16)
 
 freq_max = 100;
 t_max = 30;
@@ -27,33 +27,22 @@ for i=1:1:numel(freq)
 end
 
 fig = figure(1);
-subplot(2, 1, 1)
+subplot(1, 2, 1)
 surf(time, freq, eps)
-xlabel('Time (s)', 'FontSize', 12, 'Interpreter','latex')
-ylabel('Frequency (rad/s)','FontSize', 12, 'Interpreter','latex')
-zlabel('EPS','FontSize', 12, 'Interpreter','latex')
+xlabel('Time (s)')
+ylabel('Frequency (rad/s)')
+zlabel('EPS')
 colormap jet
 shading interp
-view([69 16])
+view([65 11])
 
-ax = gca;
-ax.XAxis.FontSize = 12;
-ax.YAxis.FontSize = 12;
-set(gca,'TickLabelInterpreter','latex')
-
-subplot(2, 1, 2)
+subplot(1, 2, 2)
 surf(time, freq, eps)
-xlabel('Time (s)', 'FontSize', 12, 'Interpreter','latex')
-ylabel('Frequency (rad/s)','FontSize', 12, 'Interpreter','latex')
+xlabel('Time (s)')
+ylabel('Frequency (rad/s)')
 colormap jet
 shading interp
 view([0 90])
 
-ax = gca;
-ax.XAxis.FontSize = 12;
-ax.YAxis.FontSize = 12;
-set(gca,'TickLabelInterpreter','latex')
-
-%saveas(fig, 'plots/eps', 'pdf')
-set(fig,'papersize',[7 5.8]);
-print(fig,'plots/eps','-dpdf')
+set(fig,'papersize',[6.0 5.5], 'Position', [200 200 900 350]);
+print(fig,'plots/eps','-dpng','-r1000')
