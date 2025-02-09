@@ -13,42 +13,6 @@ end
 
 set(groot,'defaultAxesFontSize', 16)
 
-%% Equivalent damping and natural frequencies for the same q
-vec_omega = load('data/omegaeq_oscillator_bw_ndof_3_fractional_0.75_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_bwparameters_a_0.30_A_1.00_beta_0.50_gamma_0.50_xy_0.01');
-vec_beta = load('data/betaeq_oscillator_bw_ndof_3_fractional_0.75_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_bwparameters_a_0.30_A_1.00_beta_0.50_gamma_0.50_xy_0.01');
-
-time = vec_omega.time;
-omega_eq_2 = vec_omega.omega_eq_2;
-beta_eq = vec_beta.beta_eq;
-
-fig = figure(1);
-subplot(1,2,1)
-plot(time, omega_eq_2(1,:)', '--', 'linewidth',2)
-hold on
-plot(time, omega_eq_2(2,:)', '-.', 'linewidth',2)
-plot(time, omega_eq_2(3,:)', 'linewidth',2)
-xlabel('Time (s)')
-ylabel('$\omega_{e}^2$  (N/m)')
-xlim([0 4])
-title("a) Effective time-varying stiffness")
-legend('DOF 1', 'DOF 2', 'DOF 3')
-grid
-
-subplot(1,2,2)
-plot(time, beta_eq(1,:)', '--', 'linewidth',2)
-hold on
-plot(time, beta_eq(2,:)', '-.', 'linewidth',2)
-plot(time, beta_eq(3,:)', 'linewidth',2)
-xlabel('Time (s)')
-ylabel('$\beta_{e}$ (Ns/m)')
-xlim([0 4])
-title("b) Effective time-varying damping")
-legend('DOF 1', 'DOF 2', 'DOF 3')
-grid
-
-set(fig,'papersize',[6.0 5.5], 'Position', [200 200 900 350]);
-print(fig,'plots/equivalent_stiff_damp_same_q_same_e_bw','-dpng','-r1000')
-
 %% Equivalent stiffness and damping
 a = 0.50;
 barrier = 0.25;
@@ -89,7 +53,7 @@ for i = 1:1:numel(files)
                 xlabel('Time (s)')
                 ylabel('$\omega^2_{e} $ (N/m)')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
-                title(aux)
+                title(aux, 'fontsize', 18)
                 grid(1);
                 xlim([0 4])
                 ylim([0 1600])
@@ -132,12 +96,12 @@ for i = 1:1:numel(files)
                 xlabel('Time (s)')
                 ylabel('$\beta_{e} $ (Ns/m)')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
-                title(aux)
+                title(aux, 'fontsize', 18)
                 grid(1);
                 xlim([0 4])
                 ylim([0 45])
                 xticks([0 1 2 3 4])
-                legend('q = 0.5', 'q = 0.75')
+                legend('q = 0.5', 'q = 0.75', 'location', 'north')
             end
         end
     end
@@ -190,7 +154,7 @@ for i = 1:1:numel(files)
             ylim([0 1500])
             xticks([0 1 2 3 4])
             aux = sprintf("%s) DOF %d", letters(dof), dof);
-            title(aux)
+            title(aux, 'fontsize', 18)
             grid
             legend('$\alpha$ = 0.30', '$\alpha$ = 0.50', '$\alpha$ = 0.70')
         end
@@ -228,46 +192,20 @@ for i = 1:1:numel(files)
             hold on
             plot(time,beta_eq(dof,:), marker, 'linewidth',2)
             xlim([0 4])
-            ylim([0 40])
+            ylim([0 60])
             xticks([0 1 2 3 4])
             grid
             xlabel('Time (s)')
             ylabel('$\beta_{e} $ (Ns/m)')
             aux = sprintf("%s) DOF %d", letters(dof), dof);
-            title(aux)
-            legend('$\alpha$ = 0.30', '$\alpha$ = 0.50', '$\alpha$ = 0.70', 'location', 'southeast')
+            title(aux, 'fontsize', 18)
+            legend('$\alpha$ = 0.30', '$\alpha$ = 0.50', '$\alpha$ = 0.70', 'location', 'north')
         end
     end
 end
 
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
 print(fig,'plots/equivalent_stiffines_and_damping_different_epi_bw','-dpng','-r1000')
-
-%% displacement same q and same ep
-load('data/displacement_variance_oscillator_bw_ndof_3_fractional_0.75_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_bwparameters_a_0.50_A_1.00_beta_0.50_gamma_0.50_xy_0.01')
-
-ndof = 3;
-
-fig = figure(6);
-for i=1:ndof
-    subplot(1,ndof,i); 
-    hold on
-    plot(time, sqrt(varx_sl(i,:)),'k-','linewidth',2)
-    plot(time, sqrt(c(i,:))','r--','linewidth',2)
-    plot(time_out, sqrt(varx_mcs(i,:)),'b:','linewidth',2)
-    legend('SL', 'SA', 'MCS', 'location', 'southeast')
-    xlabel('Time (s)')
-    ylabel('$\sqrt{Var[x(t)]} (m)$')
-    xlim([0 4])
-    ylim([0 0.017])
-    xticks([0 1 2 3 4])
-    aux = sprintf("DOF %d", i);
-    grid(1);
-    title(aux)
-end
-
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/displacement_std_same_q_same_epx_bw','-dpng','-r1000')
 
 %% Plot amplitude PDF
 lam = 0.25;
@@ -329,7 +267,7 @@ for i = 1:1:numel(files)
                 xlabel('Time (s)')
                 ylabel('MCS Amplitude (m)')
                 aux = sprintf('%s) DOF %d', letters(j), j);
-                title(aux)
+                title(aux, 'fontsize', 18)
         
                 subplot(2,3,j+ndof)
                 hold on
@@ -343,7 +281,7 @@ for i = 1:1:numel(files)
                 xlabel('Time (s)')
                 ylabel('Approx. Amplitude (m)')
                 aux = sprintf('%s) DOF: %d', letters(j+ndof), j);
-                title(aux)
+                title(aux, 'fontsize', 18)
             end
             break
         end    
@@ -376,20 +314,21 @@ for i = 1:1:numel(files)
             for k = 1:ndof
                 if (vec(:).q == 0.75)
                     subplot(2,ndof,k);
+                    aux = sprintf('%s) $q = %.2f$; DOF: %d', letters(k), vec(:).q, k);
                 else
                     subplot(2,ndof,k+ndof);
+                    aux = sprintf('%s) $q = %.2f$; DOF: %d', letters(k+ndof), vec(:).q, k);
                 end
                 hold on
                 plot(time, P(k,:)','b','linewidth',2);
                 plot(tfp, fpp,'r--','linewidth',2);          
                 legend('Analytical','MCS')
-                aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, k);
-                title(aux)
+                title(aux, 'fontsize', 18)
                 xlabel('Time (s)')
                 ylabel('Survival propability')
-                xlim([0 4])
+                xlim([0 2])
                 ylim([0 1])
-                xticks([0 1 2 3 4])
+                xticks([0 0.5 1 1.5 2])
                 grid(1)
             end
         end

@@ -44,5 +44,5 @@ colormap jet
 shading interp
 view([0 90])
 
-set(fig,'papersize',[6.0 5.5], 'Position', [200 200 900 350]);
+set(fig,'papersize',[6.0 5.5], 'Position', [200 200 900 175]);
 print(fig,'plots/eps','-dpng','-r1000')
