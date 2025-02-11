@@ -12,7 +12,7 @@ rng(1111);
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.50; 
+q = 0.75; 
 
 % Nonlinearity parameter:
 epx = 0.5*ones(1,ndof);
@@ -36,7 +36,7 @@ damping = 40*ones(1,ndof);
 stiffness = 10*damping;
 
 % Bouc-Wen parameters
-a_bw = 0.3*ones(1, ndof);
+a_bw = 0.5*ones(1, ndof);
 A_bw = 1;
 beta_bw = 0.5;
 gamma_bw = 0.5;
@@ -82,13 +82,15 @@ else
     str = strcat(str, sprintf('_duffingparameter_epx_%.2f', max(epx)));
 end
 
+run_mcs = true;
+
 %% load mcs previous results
-if exist(strcat('data/mcs/mcs_', str, '.mat'))
-    load(strcat('data/mcs/mcs_', str, '.mat'))
-    run_mcs = false;
-else
-    run_mcs = true;
-end
+% if exist(strcat('data/mcs/mcs_', str, '.mat'))
+%     load(strcat('data/mcs/mcs_', str, '.mat'))
+%     run_mcs = false;
+% else
+%     run_mcs = true;
+% end
 
 %% Statistical Linearization
 disp(["Running Statistical Linearization:" oscillator])
@@ -259,7 +261,9 @@ save(strcat('data/displacement_variance_', str, '.mat'), "time", "varx_sl", "c",
 
 %% Survival Probability
 bt = beta_eq;
+tic
 P = survival_probability(barrier, c, time, numel(time), bt, omega_eq_2, 15, S0);
+toc
 
 fig = figure('color',[1 1 1]);
 for i=1:ndof
