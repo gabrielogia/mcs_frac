@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.75; 
+q = 0.50; 
 
 % Nonlinearity parameter:
 epx = 0.5*ones(1,ndof);
