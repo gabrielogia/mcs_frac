@@ -206,33 +206,6 @@ end
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
 print(fig,'plots/equivalent_stiffines_and_damping_different_epi','-dpng','-r1000')
 
-%% displacement same q and same ep
-load('data/displacement_variance_oscillator_duffing_ndof_3_fractional_0.75_dt_0.0010_mcssamples_14000_damping_40.00_stiffness_400.00_barrier_0.25_powerspectrum_eps_S0_0.20_duffingparameter_epx_1.00.mat')
-ndof = 3;
-
-fig = figure(6);
-for i=1:ndof
-    subplot(1,ndof,i); 
-    hold on
-    plot(time, sqrt(varx_sl(i,:)),'k-','linewidth',2)
-    plot(time, sqrt(c(i,:))','r--','linewidth',2)
-    plot(time_out, sqrt(varx_mcs(i,:)),'b:','linewidth',2)
-    legend('SL', 'SA', 'MCS', 'location', 'southeast')
-    xlabel('Time (s)')
-    ylabel('$\sqrt{Var[x(t)]} (m)$')
-    xlim([0 4])
-    xticks([0 1 2 3 4])
-    yticks([0 0.003 0.006 0.009 0.012 0.015 0.018])
-    ylim([0 0.018])
-    aux = sprintf("DOF %d", i);
-    grid(1);
-    title(aux)
-end
-
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/displacement_std_same_q_same_epx','-dpng','-r1000')
-
-
 %% Plot amplitude PDF
 lam = 0.25;
 str1 = 'pdfs_';
@@ -329,7 +302,6 @@ for i = 1:1:numel(files)
             time = vec.time;
             fpp = vec.fpp;
             tfp = vec.tfp;
-            files(i).name
     
             fig = figure(4);
             for k = 1:ndof
@@ -346,7 +318,7 @@ for i = 1:1:numel(files)
                 title(aux)
                 xlabel('Time (s)')
                 ylabel('Survival propability')
-                xlim([0 4])
+                xlim([0 2])
                 ylim([0 1])
                 xticks([0 1 2 3 4])
                 grid(1)

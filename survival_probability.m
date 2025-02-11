@@ -30,25 +30,22 @@ function P=survival_probability(bar, c, time, num_time, beta_eq, weq2, N, S0)
         weq2_dof = weq2(dof,:);
     
         c_new = interp1(time, c_dof, time_domain, 'pchip');
-        beta_eq_new = interp1(time, beta_eq_dof, time_domain, 'pchip');
-        weq2_new = interp1(time, weq2_dof, time_domain, 'pchip');
-    
+        beqf = @(t) (interp1(time, beta_eq_dof, t, 'pchip'));
+        weq = @(t) (interp1(time, sqrt(weq2_dof), t, 'pchip'));
+        
         r_2(1) = 0;
-        for i = 2:numel(time_domain)
-            freq = sqrt(weq2_new(i));
-            S = @(t) evolutionary_power_spectrum(freq, t, S0);
-            t1 = time_domain(i-1);
-            t2 = time_domain(i);
-            I1 = integral(@(t) exp(beta_eq_new(i) * t) .* S(t), 0, t1);
-            I2 = integral(@(t) exp(beta_eq_new(i) * t) .* S(t), 0, t2);
-            r_2(i) = I1/I2;
-        end
-    
         Q = zeros(nr2,1);
         H = ones(nr2,1);
         F = zeros(nr2,1);
     
         for i = 2:numel(time_domain)
+            S = @(t) evolutionary_power_spectrum(weq(t), t, S0);
+            t1 = time_domain(i-1);
+            t2 = time_domain(i);
+            I1 = integral(@(t) exp(beqf(t) .* t) .* S(t), 0, t1);
+            I2 = integral(@(t) exp(beqf(t) .* t) .* S(t), 0, t2);
+            r_2(i) = I1/I2;
+
             c_i = c_new(i);
             c_i_1 = c_new(i-1);
             r2 = r_2(i);
