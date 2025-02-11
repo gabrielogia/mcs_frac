@@ -12,7 +12,7 @@ rng(1111);
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -25,10 +25,10 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.75; 
+q = 0.50; 
 
 % Nonlinearity parameter:
-epx = 1.5*ones(1,ndof);
+epx = 1.0*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
@@ -36,7 +36,7 @@ damping = 40*ones(1,ndof);
 stiffness = 10*damping;
 
 % Bouc-Wen parameters
-a_bw = 0.3*ones(1, ndof);
+a_bw = 0.5*ones(1, ndof);
 A_bw = 1;
 beta_bw = 0.5;
 gamma_bw = 0.5;
