@@ -25,10 +25,10 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.50; 
+q = 0.75; 
 
 % Nonlinearity parameter:
-epx = 0.5*ones(1,ndof);
+epx = 1.0*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
