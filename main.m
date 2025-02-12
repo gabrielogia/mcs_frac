@@ -12,7 +12,7 @@ rng(1111);
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -109,7 +109,7 @@ elseif (oscillator == "bw")
 end
 
 %% Equivalent damping and stiffness
-disp(["Getting omega and beta."]);
+disp("Getting omega and beta.");
 [omega_eq_2, beta_eq, beta_original, w2] = get_w2_beta(ndof, varv_sl, varx_sl, q, dT, T, time, S0, false);
 
 %% Get c(t) by solving the ODE from stochastic averaging.
@@ -147,20 +147,19 @@ if run_mcs
         monte_carlo(ns,M,C,K,epx,q,mass,damping,stiffness,fmax_ps,...
         nonstat, is_base,T,dT, barrier, S0);
     elseif (oscillator == "bw")
-        [varx_mcs, time_out, first_passage_time,response,velocity, z, amplitude] = ...
-        monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, gamma_bw, beta_bw, xy, S0);
+        [amplitude, time_out, first_passage_time] = ...
+        monte_carlo_bw_new(ns,M,C,K,q,fmax_ps,nonstat,is_base, T, dT, barrier, ndof, A_bw, ...
+                           gamma_bw, beta_bw, xy, S0, time, omega_eq_2);
     end
     toc
 
-    save(strcat('data/mcs/mcs_', str, '.mat'), "varx_mcs", "time_out", "first_passage_time", "response", "velocity", "amplitude")
+    save(strcat('data/mcs/mcs_', str, '.mat'), "amplitude", "time_out", "first_passage_time")
 else
     disp('Jumping MCS')
 end
 
 %% First passage
-disp('Getting first passage')
-[first_passage_time,amplitude] = time_failure(response,velocity,barrier,omega_eq_2,time_out,time);
-
+disp("Getting first passage")
 amplitude = abs(amplitude);
 
 am = shiftdim(amplitude,1);
@@ -211,7 +210,7 @@ title('Analytical probability density function', 'Interpreter', 'latex', 'FontSi
 saveas(fig, strcat('plots/pdfs_', str, '.pdf'))
 save(strcat('data/pdfs_', str, '.mat'), "time_out", "av", "pr", "pa", "bar", "ha")
 
-%% plot omega_eq, beta_eq, and var displacement
+%% plot omega_eq and beta_eq
 disp('Plotting omega, beta, and displacement')
 
 fig = figure('color',[1 1 1]);
@@ -241,23 +240,6 @@ end
 
 saveas(fig, strcat('plots/betaeq_', str, '.pdf'))
 save(strcat('data/betaeq_', str, '.mat'), "time", "beta_eq", "beta_original")
-
-fig = figure('color',[1 1 1]);
-for i=1:ndof
-    subplot(ndof,1,i); 
-    hold on
-    plot(time, sqrt(varx_sl(i,:)),'k-','linewidth',2)
-    plot(time, sqrt(c(i,:))','r--','linewidth',2)
-    plot(time_out,sqrt(varx_mcs(i,:)),'b:','linewidth',2)
-    xlim([0 4])
-    legend('SL', 'SA', 'MCS','interpreter','latex', 'FontSize', 10)
-    xlabel('Time','interpreter','latex', 'FontSize', 14)
-    ylabel('$\sigma[x(t)]$','interpreter','latex', 'FontSize', 14)
-    title('Oscillator displacement variance', 'Interpreter', 'latex', 'FontSize', 16)
-end
-
-saveas(fig, strcat('plots/displacement_variance_', str, '.pdf'))
-save(strcat('data/displacement_variance_', str, '.mat'), "time", "varx_sl", "c", "time_out", "varx_mcs")
 
 %% Survival Probability
 bt = beta_eq;
