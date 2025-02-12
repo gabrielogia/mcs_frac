@@ -16,7 +16,8 @@ set(groot,'defaultAxesFontSize', 16)
 %% Equivalent stiffness and damping
 a = 0.50;
 barrier = 0.25;
-str0 = 'bw';
+xy = 0.001;
+str0 = sprintf('xy_%.2f', xy);
 str1 = 'omegaeq_';
 str2 = sprintf('_a_%.2f', a);
 str3 = sprintf('barrier_%.2f', barrier);
@@ -50,8 +51,8 @@ for i = 1:1:numel(files)
                 subplot(2,ndof, dof); 
                 hold on
                 plot(time,omega_eq_2(dof,:), marker, 'linewidth',2)
-                xlabel('Time (s)')
-                ylabel('$\omega^2_{e} $ (N/m)')
+                xlabel('Time')
+                ylabel('$\omega^2_{e}$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
                 title(aux, 'fontsize', 18)
                 grid(1);
@@ -93,8 +94,8 @@ for i = 1:1:numel(files)
                 subplot(2,ndof, ndof+dof); 
                 hold on
                 plot(time,beta_eq(dof,:), marker, 'linewidth',2)
-                xlabel('Time (s)')
-                ylabel('$\beta_{e} $ (Ns/m)')
+                xlabel('Time')
+                ylabel('$\beta_{e}$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
                 title(aux, 'fontsize', 18)
                 grid(1);
@@ -111,9 +112,9 @@ set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
 print(fig,'plots/equivalent_stiffness_and_beta_different_q_bw','-dpng','-r1000')
 
 %% Equivalent stiffness and damping for diferent non-linearities
-str0 = 'bw';
-str1 = 'omegaeq_';
 q = 0.75;
+str0 = sprintf('xy_%.2f', xy);
+str1 = 'omegaeq_';
 str2 = sprintf('fractional_%.2f', q);
 str3 = sprintf('mcssamples_%d', 14000);
 str4 = sprintf('barrier_%.2f', barrier);
@@ -148,8 +149,8 @@ for i = 1:1:numel(files)
             subplot(2,ndof, dof); 
             hold on
             plot(time,omega_eq_2(dof,:), marker, 'linewidth',2)
-            xlabel('Time (s)')
-            ylabel('$\omega^2_{e} $ (N/m)')
+            xlabel('Time')
+            ylabel('$\omega^2_{e}$')
             xlim([0 4])
             ylim([0 1500])
             xticks([0 1 2 3 4])
@@ -215,7 +216,7 @@ q = 0.75;
 str1 = 'pdfs_';
 str2 = sprintf('_a_%.2f', a);
 str3 = sprintf('barrier_%.2f', lam);
-str4 = "bw";
+str4 = sprintf('xy_%.2f', xy);
 
 letters = ["a" "b" "c" "d" "e" "f"];
 
@@ -260,12 +261,12 @@ for i = 1:1:numel(files)
                 surf(time_out,av,pr(:,:,j));
                 plot3(time_out,ones(size(time_out))*barrier(j),ha,'r','linewidth',2)
                 clim([0, 300])
-                ylim([0, 0.04])
+                ylim([0, 0.03])
                 xlim([0 4])
                 xticks([0 1 2 3 4])
                 shading interp
-                xlabel('Time (s)')
-                ylabel('MCS Amplitude (m)')
+                xlabel('Time')
+                ylabel('Amplitude')
                 aux = sprintf('%s) DOF %d', letters(j), j);
                 title(aux, 'fontsize', 18)
         
@@ -274,12 +275,12 @@ for i = 1:1:numel(files)
                 surf(time_out,av,pa(:,:,j));
                 plot3(time_out,ones(size(time_out))*barrier(j),ha,'r','linewidth',2)
                 clim([0, 300])
-                ylim([0, 0.04])
+                ylim([0, 0.03])
                 xlim([0 4])
                 xticks([0 1 2 3 4])
                 shading interp
-                xlabel('Time (s)')
-                ylabel('Approx. Amplitude (m)')
+                xlabel('Time')
+                ylabel('Amplitude')
                 aux = sprintf('%s) DOF: %d', letters(j+ndof), j);
                 title(aux, 'fontsize', 18)
             end
@@ -292,11 +293,11 @@ set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
 print(fig,'plots/amplitude_pdf_bw','-dpng','-r1000')
 
 %% survival probability
+barrier = 0.25;
 str1 = 'firsttimepassage_';
 str2 = sprintf('_a_%.2f', a);
-barrier = 0.25;
 str3 = sprintf('barrier_%.2f', barrier);
-str4 = "bw";
+str4 = sprintf('xy_%.2f', xy);
 
 for i = 1:1:numel(files)
     if (contains(files(i).name, str1) && contains(files(i).name, str2) && contains(files(i).name, str3) && contains(files(i).name, str4))
@@ -324,7 +325,7 @@ for i = 1:1:numel(files)
                 plot(tfp, fpp,'r--','linewidth',2);          
                 legend('Analytical','MCS')
                 title(aux, 'fontsize', 18)
-                xlabel('Time (s)')
+                xlabel('Time')
                 ylabel('Survival propability')
                 xlim([0 2])
                 ylim([0 1])
