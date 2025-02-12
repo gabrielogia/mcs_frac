@@ -48,8 +48,8 @@ for i = 1:1:numel(files)
                 subplot(2,ndof, dof); 
                 hold on
                 plot(time,omega_eq_2(dof,:), marker, 'linewidth',2)
-                xlabel('Time (s)')
-                ylabel('$\omega^2_{e} $ (N/m)')
+                xlabel('Time')
+                ylabel('$\omega^2_{e}$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
                 title(aux,'FontSize',18)
                 grid("on");
@@ -91,8 +91,8 @@ for i = 1:1:numel(files)
                 subplot(2,ndof, ndof+dof); 
                 hold on
                 plot(time,beta_eq(dof,:), marker, 'linewidth',2)
-                xlabel('Time (s)')
-                ylabel('$\beta_{e} $ (Ns/m)')
+                xlabel('Time')
+                ylabel('$\beta_{e}$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
                 title(aux, 'FontSize',18)
                 grid("on");
@@ -147,8 +147,8 @@ for i = 1:1:numel(files)
             subplot(2,ndof, dof); 
             hold on
             plot(time,omega_eq_2(dof,:), marker, 'linewidth',2)
-            xlabel('Time (s)')
-            ylabel('$\omega^2_{e} $ (N/m)')
+            xlabel('Time')
+            ylabel('$\omega^2_{e}$')
             xlim([0 4])
             ylim([0 1500])
             xticks([0 1 2 3 4])
@@ -194,8 +194,8 @@ for i = 1:1:numel(files)
             ylim([0 35])
             xticks([0 1 2 3 4])
             grid
-            xlabel('Time (s)')
-            ylabel('$\beta_{e} $ (Ns/m)')
+            xlabel('Time')
+            ylabel('$\beta_{e}$')
             aux = sprintf("%s) DOF %d", letters(dof), dof);
             title(aux)
             legend('$\epsilon$ = 0.50', '$\epsilon$ = 1.00', '$\epsilon$ = 2.00', 'location', 'southeast')
@@ -257,12 +257,12 @@ for i = 1:1:numel(files)
                 surf(time_out,av,pr(:,:,j));
                 plot3(time_out,ones(size(time_out))*barrier(j),ha,'r','linewidth',2)
                 clim([0, 300])
-                ylim([0, 0.04])
+                ylim([0, 0.03])
                 xlim([0 4])
                 xticks([0 1 2 3 4])
                 shading interp
-                xlabel('Time (s)')
-                ylabel('MCS Amplitude (m)')
+                xlabel('Time')
+                ylabel('Amplitude')
                 aux = sprintf('%s) DOF %d', letters(j), j);
                 title(aux)
         
@@ -271,12 +271,12 @@ for i = 1:1:numel(files)
                 surf(time_out,av,pa(:,:,j));
                 plot3(time_out,ones(size(time_out))*barrier(j),ha,'r','linewidth',2)
                 clim([0, 300])
-                ylim([0, 0.04])
+                ylim([0, 0.03])
                 xlim([0 4])
                 xticks([0 1 2 3 4])
                 shading interp
-                xlabel('Time (s)')
-                ylabel('Approx. Amplitude (m)')
+                xlabel('Time')
+                ylabel('Amplitude')
                 aux = sprintf('%s) DOF: %d', letters(j+ndof), j);
                 title(aux)
             end
@@ -316,7 +316,7 @@ for i = 1:1:numel(files)
                 legend('Analytical','MCS')
                 aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, k);
                 title(aux)
-                xlabel('Time (s)')
+                xlabel('Time')
                 ylabel('Survival propability')
                 xlim([0 2])
                 ylim([0 1])
