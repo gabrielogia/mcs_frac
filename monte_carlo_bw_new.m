@@ -21,7 +21,7 @@ function [amplitude, time_out, first_passage_time] = monte_carlo_bw_new(ns,M,C,K
     %MCS
     tt = 0:dT:T;
     Nrk = 3000;
-    amplitude = zeros(ndof,Nrk,ns);
+    amplitude = single(zeros(ndof,Nrk,ns));
     time_out = linspace(tt(1), tt(end), Nrk)';
     tf = zeros(ns,ndof);
     
