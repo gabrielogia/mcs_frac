@@ -49,7 +49,7 @@ for i = 1:1:numel(files)
                 hold on
                 plot(time,omega_eq_2(dof,:), marker, 'linewidth',2)
                 xlabel('Time')
-                ylabel('$\omega^2_{e}$')
+                ylabel('$\omega^2_{e} (t)$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
                 title(aux,'FontSize',18)
                 grid("on");
@@ -92,7 +92,7 @@ for i = 1:1:numel(files)
                 hold on
                 plot(time,beta_eq(dof,:), marker, 'linewidth',2)
                 xlabel('Time')
-                ylabel('$\beta_{e}$')
+                ylabel('$\beta_{e} (t)$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
                 title(aux, 'FontSize',18)
                 grid("on");
@@ -108,103 +108,6 @@ end
 
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
 print(fig,'plots/equivalent_stiffness_and_beta_different_q','-dpng','-r1000')
-
-
-%% Equivalent stiffness and damping for diferent non-linearities
-str0 = 'duffing';
-str1 = 'omegaeq_';
-q = 0.75;
-str2 = sprintf('fractional_%.2f', q);
-str3 = sprintf('mcssamples_%d', 14000);
-
-markers = ["--", "-.", "-"];
-letters = ["a", "b", "c"];
-
-for i = 1:1:numel(files)
-    if(contains(files(i).name, str0) && contains(files(i).name, str1) ...
-            && contains(files(i).name, str2) && contains(files(i).name, str3))
-        vec = load(strcat('data/', files(i).name));
-        str_split = strsplit(files(i).name,"_");
-        str_split = strsplit(string(str_split(24)), ".mat");
-        vec(:).epx = str2double(str_split(1));
-
-        if (vec(:).epx == 0.50)
-            marker = markers(1);
-        elseif (vec(:).epx == 1.00)
-            marker = markers(2);
-        else
-            marker = markers(3);
-        end
-
-        ndof = size(vec.omega_eq_2);
-        ndof = ndof(1);
-
-        time = vec.time;
-        omega_eq_2 = vec.omega_eq_2;
-    
-        fig = figure(5);
-        for dof = 1:1:ndof
-            subplot(2,ndof, dof); 
-            hold on
-            plot(time,omega_eq_2(dof,:), marker, 'linewidth',2)
-            xlabel('Time')
-            ylabel('$\omega^2_{e}$')
-            xlim([0 4])
-            ylim([0 1500])
-            xticks([0 1 2 3 4])
-            aux = sprintf("%s) DOF %d", letters(dof), dof);
-            title(aux)
-            grid
-            legend('$\epsilon$ = 0.50', '$\epsilon$ = 1.00', '$\epsilon$ = 2.00')
-        end
-    end
-end
-
-str1 = 'betaeq_';
-letters = ["d", "e", "f"];
-
-for i = 1:1:numel(files)
-    if(contains(files(i).name, str0) && contains(files(i).name, str1) ...
-            && contains(files(i).name, str2) && contains(files(i).name, str3))
-        vec = load(strcat('data/', files(i).name));
-        str_split = strsplit(files(i).name,"_");
-        str_split = strsplit(string(str_split(24)), ".mat");
-        vec(:).epx = str2double(str_split(1));
-
-        if (vec(:).epx == 0.50)
-            marker = markers(1);
-        elseif (vec(:).epx == 1.00)
-            marker = markers(2);
-        else
-            marker = markers(3);
-        end
-
-        ndof = size(vec.beta_eq);
-        ndof = ndof(1);
-
-        time = vec.time;
-        beta_eq = vec.beta_eq;
-    
-        figure(5);
-        for dof = 1:1:ndof
-            subplot(2,ndof, dof+ndof); 
-            hold on
-            plot(time,beta_eq(dof,:), marker, 'linewidth',2)
-            xlim([0 4])
-            ylim([0 35])
-            xticks([0 1 2 3 4])
-            grid
-            xlabel('Time')
-            ylabel('$\beta_{e}$')
-            aux = sprintf("%s) DOF %d", letters(dof), dof);
-            title(aux)
-            legend('$\epsilon$ = 0.50', '$\epsilon$ = 1.00', '$\epsilon$ = 2.00', 'location', 'southeast')
-        end
-    end
-end
-
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/equivalent_stiffines_and_damping_different_epi','-dpng','-r1000')
 
 %% Plot amplitude PDF
 lam = 0.25;
@@ -314,7 +217,7 @@ for i = 1:1:numel(files)
                 plot(time, P(k,:)','b','linewidth',2);
                 plot(tfp, fpp,'r--','linewidth',2);          
                 legend('Analytical','MCS')
-                aux = sprintf('$q = %.2f$; DOF: %d', vec(:).q, k);
+                aux = sprintf('q$ = %.2f$; DOF: %d', vec(:).q, k);
                 title(aux)
                 xlabel('Time')
                 ylabel('Survival propability')
