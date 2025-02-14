@@ -19,13 +19,13 @@ is_base = false;
 nonstat = true;
 
 % Number of DOFs:
-ndof = 15;
+ndof = 3;
 
 % Power spectrum mag
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.75; 
+q = 0.50; 
 
 % Nonlinearity parameter:
 epx = 1.0*ones(1,ndof);
@@ -82,15 +82,13 @@ else
     str = strcat(str, sprintf('_duffingparameter_epx_%.2f', max(epx)));
 end
 
-run_mcs = true;
-
-%% load mcs previous results
-% if exist(strcat('data/mcs/mcs_', str, '.mat'))
-%     load(strcat('data/mcs/mcs_', str, '.mat'))
-%     run_mcs = false;
-% else
-%     run_mcs = true;
-% end
+% load mcs previous results
+if exist(strcat('data/mcs/mcs_', str, '.mat'))
+    load(strcat('data/mcs/mcs_', str, '.mat'))
+    run_mcs = false;
+else
+    run_mcs = true;
+end
 
 %% Statistical Linearization
 disp(["Running Statistical Linearization:" oscillator])
@@ -256,6 +254,10 @@ for i=1:ndof
     hold on
     plot(time, P(i,:)','b','linewidth',2);
     plot(tfp, fpp,'r--','linewidth',2);
+
+    fp_time(i,:) = tfp;
+    survival_prob_ksd(i,:) = fpp;
+
     legend('Analytical', 'MCS')
 
     title(i)
@@ -266,4 +268,4 @@ for i=1:ndof
 end
 
 saveas(fig, strcat('plots/firsttimepassage_', str, '.pdf'))
-save(strcat('data/firsttimepassage_', str, '.mat'), "time", "P", "tfp", "fpp")
+save(strcat('data/firsttimepassage_', str, '.mat'), "time", "P", "fp_time", "survival_prob_ksd", "smaxi", "barrier", "lam")
