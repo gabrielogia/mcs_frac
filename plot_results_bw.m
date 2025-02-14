@@ -17,16 +17,21 @@ set(groot,'defaultAxesFontSize', 16)
 a = 0.50;
 barrier = 0.25;
 xy = 0.001;
+ndof = 3;
+ns = 14000;
 str0 = sprintf('xy_%.2f', xy);
 str1 = 'omegaeq_';
 str2 = sprintf('_a_%.2f', a);
 str3 = sprintf('barrier_%.2f', barrier);
+str4 = sprintf('ndof_%d', ndof);
+str5 = sprintf('mcssamples_%d', ns);
 
 markers = ["-", "-."];
 letters = ["a", "b", "b"];
 
 for i = 1:1:numel(files)
-    if(contains(files(i).name, str0) && contains(files(i).name, str1) && contains(files(i).name, str2) && contains(files(i).name, str3))
+    if(contains(files(i).name, str0) && contains(files(i).name, str1) && contains(files(i).name, str2) && ...
+            contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
@@ -69,7 +74,8 @@ str1 = 'betaeq_';
 letters = ["d", "e", "f"];
 
 for i = 1:1:numel(files)
-    if(contains(files(i).name, str0) && contains(files(i).name, str1) && contains(files(i).name, str2) && contains(files(i).name, str3))
+    if(contains(files(i).name, str0) && contains(files(i).name, str1) && contains(files(i).name, str2) && ...
+            contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
@@ -112,19 +118,25 @@ set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
 print(fig,'plots/equivalent_stiffness_and_beta_different_q_bw','-dpng','-r1000')
 
 %% Plot amplitude PDF
-lam = 0.25;
 a = 0.50;
-ndof = 3;
+lambda = 0.25;
 q = 0.75;
+xy = 0.00;
+ndof = 3;
+ns = 14000;
+str0 = sprintf('xy_%.2f', xy);
 str1 = 'pdfs_';
 str2 = sprintf('_a_%.2f', a);
-str3 = sprintf('barrier_%.2f', lam);
-str4 = sprintf('xy_%.2f', xy);
+str3 = sprintf('barrier_%.2f', lambda);
+str4 = sprintf('ndof_%d', ndof);
+str5 = sprintf('mcssamples_%d', ns);
 
 letters = ["a" "b" "c" "d" "e" "f"];
 
 for i = 1:1:numel(files)
-    if (contains(files(i).name, 'displacement_variance') && contains(files(i).name, str2) && contains(files(i).name, str3) && contains(files(i).name, str4))
+    if(contains(files(i).name, str0) && contains(files(i).name, str2) && ...
+            contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5) ...
+            && contains(files(i).name, "displacement"))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(8));
@@ -138,12 +150,13 @@ for i = 1:1:numel(files)
             
             smaxi = max(smaxt);
             for j=1:ndof
-                barrier(j) = lam*sqrt(smaxi);
+                barrier(j) = lambda*sqrt(smaxi);
             end
         end
     end
     
-    if(contains(files(i).name, str1) && contains(files(i).name, str2) && contains(files(i).name, str3) && contains(files(i).name, str4))
+    if(contains(files(i).name, str0) && contains(files(i).name, str1) && contains(files(i).name, str2) && ...
+            contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));

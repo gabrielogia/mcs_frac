@@ -208,27 +208,28 @@ for i = 1:1:numel(files)
     
             fig = figure(4);
             for k = 1:ndof
-                if (vec(:).q == 0.75)
-                    subplot(2,ndof,k);
-                else
-                    subplot(2,ndof,k+ndof);
-                end
+                subplot(1,ndof,k)
                 hold on
-                plot(time, P(k,:)','b','linewidth',2);
-                plot(tfp, fpp,'r--','linewidth',2);          
-                legend('Analytical','MCS')
-                aux = sprintf('q$ = %.2f$; DOF: %d', vec(:).q, k);
+                if (vec(:).q  == 0.75)
+                    plot(time, P(k,:)','b','linewidth',2);
+                    plot(tfp, fpp,'b--','linewidth',2);
+                else
+                    plot(time, P(k,:)','r','linewidth',2);
+                    plot(tfp, fpp,'r--','linewidth',2);
+                end
+                aux = sprintf('DOF: %d', k);
+                legend('Analytical - q = 0.5', 'MCS - q = 0.5', 'Analytical - q = 0.75', 'MCS - q = 0.75')
                 title(aux)
                 xlabel('Time')
                 ylabel('Survival propability')
                 xlim([0 2])
                 ylim([0 1])
                 xticks([0 1 2 3 4])
-                grid(1)
+                grid on
             end
         end
     end
 end
 
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/survival_prop','-dpng','-r1000')
+set(fig,'papersize',[6.0 5.5], 'Position',[200 200 1200 350]);
+%print(fig,'plots/survival_prop','-dpng','-r1000')
