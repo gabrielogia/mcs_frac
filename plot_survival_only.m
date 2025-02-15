@@ -18,7 +18,7 @@ set(groot,'defaultAxesFontSize', 16)
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Number of DOFs:
 ndof = 3;
@@ -85,7 +85,6 @@ for jj=1:numQ
     load(strcat('data/firsttimepassage_', str, '.mat'))
     load(strcat('data/omegaeq_', str, '.mat'))
     load(strcat('data/betaeq_', str, '.mat'))
-    load(strcat('data/', str, '.mat'), 'c')
     
     lam = [0.25, 0.50, 0.75];
     numB = numel(lam);
@@ -144,4 +143,4 @@ legend('Analytical: $\lambda$ = 0.25', 'MCS: $\lambda$ = 0.25', ...
     'Location',[0.067040182749433,0.491111111111111,0.857126483917236,0.026044444508022], ...
     'Orientation', 'horizontal')
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 1400 900]);
-print(fig,'plots/survival_prop_only_bw','-dpng','-r1000')
+print(fig,strcat('plots/survival_prop_only_', oscillator),'-dpng','-r1000')

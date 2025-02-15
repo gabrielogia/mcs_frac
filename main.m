@@ -12,7 +12,7 @@ rng(1111);
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
@@ -268,4 +268,4 @@ for i=1:ndof
 end
 
 saveas(fig, strcat('plots/firsttimepassage_', str, '.pdf'))
-save(strcat('data/firsttimepassage_', str, '.mat'), "time", "P", "fp_time", "survival_prob_ksd", "smaxi", "barrier", "lam")
+save(strcat('data/firsttimepassage_', str, '.mat'), "time", "P", "fp_time", "survival_prob_ksd", "smaxi", "barrier", "lam", "c")
