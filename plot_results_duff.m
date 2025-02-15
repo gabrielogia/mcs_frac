@@ -11,18 +11,25 @@ for i = 1:length(index_interpreter)
     set(groot, default_name,'latex');
 end
 
-set(groot,'defaultAxesFontSize',16)
+set(groot,'defaultAxesFontSize', 16)
 
 %% Equivalent stiffness and damping
-epx = 1;
+lambda = 0.25;
+eps = 1.0;
+ndof = 3;
+ns = 14000;
+str0 = sprintf('epx_%.2f', eps);
 str1 = 'omegaeq_';
-str2 = sprintf('epx_%.2f', epx);
+str3 = sprintf('barrier_%.2f', lambda);
+str4 = sprintf('ndof_%d', ndof);
+str5 = sprintf('mcssamples_%d', ns);
 
 markers = ["-", "-."];
 letters = ["a", "b", "b"];
 
 for i = 1:1:numel(files)
-    if(contains(files(i).name, str1) && contains(files(i).name, str2))
+    if(contains(files(i).name, str0) && contains(files(i).name, str1) && ...
+            contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
@@ -43,18 +50,17 @@ for i = 1:1:numel(files)
     
         fig = figure(2);
         if (marker ~= "")
-            vec(:).q
             for dof = 1:1:ndof
                 subplot(2,ndof, dof); 
                 hold on
                 plot(time,omega_eq_2(dof,:), marker, 'linewidth',2)
                 xlabel('Time')
-                ylabel('$\omega^2_{e} (t)$')
+                ylabel('$\omega^2_{e}(t)$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
-                title(aux,'FontSize',18)
-                grid("on");
+                title(aux, 'fontsize', 18)
+                grid(1);
                 xlim([0 4])
-                ylim([0 1500])
+                ylim([0 1600])
                 xticks([0 1 2 3 4])
                 legend('q = 0.5', 'q = 0.75')
             end
@@ -66,7 +72,8 @@ str1 = 'betaeq_';
 letters = ["d", "e", "f"];
 
 for i = 1:1:numel(files)
-    if(contains(files(i).name, str1) && contains(files(i).name, str2))
+    if(contains(files(i).name, str0) && contains(files(i).name, str1) && ...
+            contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
@@ -92,14 +99,13 @@ for i = 1:1:numel(files)
                 hold on
                 plot(time,beta_eq(dof,:), marker, 'linewidth',2)
                 xlabel('Time')
-                ylabel('$\beta_{e} (t)$')
+                ylabel('$\beta_{e}(t)$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
-                title(aux, 'FontSize',18)
-                grid("on");
+                title(aux, 'fontsize', 18)
+                grid(1);
                 xlim([0 4])
+                ylim([0 45])
                 xticks([0 1 2 3 4])
-                ylim([0 50])
-                yticks([0 25 50])
                 legend('q = 0.5', 'q = 0.75', 'location', 'north')
             end
         end
@@ -107,39 +113,80 @@ for i = 1:1:numel(files)
 end
 
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/equivalent_stiffness_and_beta_different_q','-dpng','-r1000')
+print(fig,'plots/equivalent_stiffness_and_beta_different_q_bw','-dpng','-r1000')
 
-%% Plot amplitude PDF
-lam = 0.25;
-str1 = 'pdfs_';
-epx = 1;
+%% survival probability
+lambda = 0.25;
 ndof = 3;
-str2 = sprintf('epx_%.2f', epx);
-q = 0.75;
-
+ns = 14000;
+eps = 1.0;
+str1 = 'firsttimepassage_';
+str2 = sprintf('epx_%.2f', eps);
+str3 = sprintf('barrier_%.2f', lambda);
+str5 = sprintf('ndof_%d', ndof);
+str6 = sprintf('mcssamples_%d', ns);
 letters = ["a" "b" "c" "d" "e" "f"];
 
 for i = 1:1:numel(files)
-    if (contains(files(i).name, 'displacement_variance') && contains(files(i).name, str2))
+    if (contains(files(i).name, str1) && contains(files(i).name, str2) && contains(files(i).name, str3) ...
+            && contains(files(i).name, str5) && contains(files(i).name, str6))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
-        vec(:).q = str2double(str_split(8));
+        vec(:).q = str2double(str_split(7));
 
-        if (str2double(str_split(8)) == q)
-            c = vec.c;
+        if (vec(:).q == 0.75 || vec(:).q == 0.50)
+            P = vec.P;
+            time = vec.time;
+            fpp = vec.survival_prob_ksd;
+            tfp = vec.fp_time;
     
-            for j=1:ndof
-                smaxt(j) = max(c(j,:));
-            end
-            
-            smaxi = max(smaxt);
-            for j=1:ndof
-                barrier(j) = lam*sqrt(smaxi);
+            fig = figure(4);
+            for k = 1:ndof
+                if (vec(:).q == 0.75)
+                    subplot(2,ndof,k);
+                    aux = sprintf('%s) q $= %.2f$; DOF: %d', letters(k), vec(:).q, k);
+                else
+                    subplot(2,ndof,k+ndof);
+                    aux = sprintf('%s) q$ = %.2f$; DOF: %d', letters(k+ndof), vec(:).q, k);
+                end
+                plot(time, P(k,:)','b','linewidth',2);          
+                title(aux, 'fontsize', 18)
+                xlabel('Time')
+                ylabel('Survival propability')
+                xlim([0 2])
+                ylim([0 1])
+                hold on
+                plot(tfp(k,:), fpp(k,:),'r--','linewidth',2);
+                xticks([0 0.5 1 1.5 2])
+                grid on
+                legend('Analytical','MCS')
             end
         end
     end
-    
-    if(contains(files(i).name, str1) && contains(files(i).name, str2))
+end
+
+barrier = vec.barrier;
+
+set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
+print(fig,'plots/survival_prop_bw','-dpng','-r1000')
+
+%% Plot amplitude PDF
+epx = 1.00;
+lambda = 0.25;
+q = 0.75;
+ndof = 3;
+ns = 14000;
+str1 = 'pdfs_';
+str2 = sprintf('epx_%.2f', epx);
+str3 = sprintf('barrier_%.2f', lambda);
+str4 = sprintf('ndof_%d', ndof);
+str5 = sprintf('mcssamples_%d', ns);
+
+letters = ["a" "b" "c" "d" "e" "f"];
+
+for i = 1:1:numel(files)    
+    if(contains(files(i).name, str0) && contains(files(i).name, str1) && contains(files(i).name, str2) && ...
+            contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5))
         vec = load(strcat('data/', files(i).name));
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
@@ -151,9 +198,9 @@ for i = 1:1:numel(files)
             time_out = vec.time_out;
 
             ha = ones(size(time_out))*1000;
+            fig = figure(3);
 
             for j = 1:1:ndof
-                fig = figure(3);
                 colormap jet
                 subplot(2,3,j)
                 hold on
@@ -167,7 +214,7 @@ for i = 1:1:numel(files)
                 xlabel('Time')
                 ylabel('Amplitude')
                 aux = sprintf('%s) DOF %d', letters(j), j);
-                title(aux)
+                title(aux, 'fontsize', 18)
         
                 subplot(2,3,j+ndof)
                 hold on
@@ -181,55 +228,12 @@ for i = 1:1:numel(files)
                 xlabel('Time')
                 ylabel('Amplitude')
                 aux = sprintf('%s) DOF: %d', letters(j+ndof), j);
-                title(aux)
+                title(aux, 'fontsize', 18)
             end
             break
-        end
+        end    
     end
 end
 
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/amplitude_pdf','-dpng','-r1000')
-
-%% survival probability
-str1 = 'firsttimepassage_';
-
-for i = 1:1:numel(files)
-    if (contains(files(i).name, str1) && contains(files(i).name, str2))
-        vec = load(strcat('data/', files(i).name));
-        str_split = strsplit(files(i).name,"_");
-        vec(:).q = str2double(str_split(7));
-
-        if (vec(:).q == 0.75 || vec(:).q == 0.50)
-            P = vec.P;
-            time = vec.time;
-            fpp = vec.fpp;
-            tfp = vec.tfp;
-    
-            fig = figure(4);
-            for k = 1:ndof
-                subplot(1,ndof,k)
-                hold on
-                if (vec(:).q  == 0.75)
-                    plot(time, P(k,:)','b','linewidth',2);
-                    plot(tfp, fpp,'b--','linewidth',2);
-                else
-                    plot(time, P(k,:)','r','linewidth',2);
-                    plot(tfp, fpp,'r--','linewidth',2);
-                end
-                aux = sprintf('DOF: %d', k);
-                legend('Analytical - q = 0.5', 'MCS - q = 0.5', 'Analytical - q = 0.75', 'MCS - q = 0.75')
-                title(aux)
-                xlabel('Time')
-                ylabel('Survival propability')
-                xlim([0 2])
-                ylim([0 1])
-                xticks([0 1 2 3 4])
-                grid on
-            end
-        end
-    end
-end
-
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 1200 350]);
-%print(fig,'plots/survival_prop','-dpng','-r1000')
+print(fig,'plots/amplitude_pdf_bw','-dpng','-r1000')

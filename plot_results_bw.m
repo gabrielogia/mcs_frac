@@ -15,14 +15,14 @@ set(groot,'defaultAxesFontSize', 16)
 
 %% Equivalent stiffness and damping
 a = 0.50;
-barrier = 0.25;
+lambda = 0.25;
 xy = 0.001;
 ndof = 3;
 ns = 14000;
 str0 = sprintf('xy_%.2f', xy);
 str1 = 'omegaeq_';
 str2 = sprintf('_a_%.2f', a);
-str3 = sprintf('barrier_%.2f', barrier);
+str3 = sprintf('barrier_%.2f', lambda);
 str4 = sprintf('ndof_%d', ndof);
 str5 = sprintf('mcssamples_%d', ns);
 
@@ -117,6 +117,63 @@ end
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
 print(fig,'plots/equivalent_stiffness_and_beta_different_q_bw','-dpng','-r1000')
 
+%% survival probability
+lambda = 0.25;
+ndof = 3;
+ns = 14000;
+a = 0.5;
+xy = 0.001;
+str1 = 'firsttimepassage_';
+str2 = sprintf('_a_%.2f', a);
+str3 = sprintf('barrier_%.2f', lambda);
+str4 = sprintf('xy_%.2f', xy);
+str5 = sprintf('ndof_%d', ndof);
+str6 = sprintf('mcssamples_%d', ns);
+letters = ["a" "b" "c" "d" "e" "f"];
+
+for i = 1:1:numel(files)
+    if (contains(files(i).name, str1) && contains(files(i).name, str2) && contains(files(i).name, str3) ...
+            && contains(files(i).name, str4) && contains(files(i).name, str5) && contains(files(i).name, str6))
+        vec = load(strcat('data/', files(i).name));
+        str_split = strsplit(files(i).name,"_");
+        vec(:).q = str2double(str_split(7));
+
+        if (vec(:).q == 0.75 || vec(:).q == 0.50)
+            P = vec.P;
+            time = vec.time;
+            fpp = vec.survival_prob_ksd;
+            tfp = vec.fp_time;
+    
+            fig = figure(4);
+            for k = 1:ndof
+                if (vec(:).q == 0.75)
+                    subplot(2,ndof,k);
+                    aux = sprintf('%s) q $= %.2f$; DOF: %d', letters(k), vec(:).q, k);
+                else
+                    subplot(2,ndof,k+ndof);
+                    aux = sprintf('%s) q$ = %.2f$; DOF: %d', letters(k+ndof), vec(:).q, k);
+                end
+                plot(time, P(k,:)','b','linewidth',2);          
+                title(aux, 'fontsize', 18)
+                xlabel('Time')
+                ylabel('Survival propability')
+                xlim([0 2])
+                ylim([0 1])
+                hold on
+                plot(tfp(k,:), fpp(k,:),'r--','linewidth',2);
+                xticks([0 0.5 1 1.5 2])
+                grid on
+                legend('Analytical','MCS')
+            end
+        end
+    end
+end
+
+barrier = vec.barrier;
+
+set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
+print(fig,'plots/survival_prop_bw','-dpng','-r1000')
+
 %% Plot amplitude PDF
 a = 0.50;
 lambda = 0.25;
@@ -133,28 +190,7 @@ str5 = sprintf('mcssamples_%d', ns);
 
 letters = ["a" "b" "c" "d" "e" "f"];
 
-for i = 1:1:numel(files)
-    if(contains(files(i).name, str0) && contains(files(i).name, str2) && ...
-            contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5) ...
-            && contains(files(i).name, "displacement"))
-        vec = load(strcat('data/', files(i).name));
-        str_split = strsplit(files(i).name,"_");
-        vec(:).q = str2double(str_split(8));
-
-        if (str2double(str_split(8)) == q)
-            c = vec.c;
-    
-            for j=1:ndof
-                smaxt(j) = max(c(j,:));
-            end
-            
-            smaxi = max(smaxt);
-            for j=1:ndof
-                barrier(j) = lambda*sqrt(smaxi);
-            end
-        end
-    end
-    
+for i = 1:1:numel(files)    
     if(contains(files(i).name, str0) && contains(files(i).name, str1) && contains(files(i).name, str2) && ...
             contains(files(i).name, str3) && contains(files(i).name, str4) && contains(files(i).name, str5))
         vec = load(strcat('data/', files(i).name));
@@ -207,55 +243,3 @@ end
 
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
 print(fig,'plots/amplitude_pdf_bw','-dpng','-r1000')
-
-%% survival probability
-barrier = 0.25;
-ndof = 3;
-ns = 14000;
-str1 = 'firsttimepassage_';
-str2 = sprintf('_a_%.2f', a);
-str3 = sprintf('barrier_%.2f', barrier);
-str4 = sprintf('xy_%.2f', xy);
-str5 = sprintf('ndof_%d', ndof);
-str6 = sprintf('mcssamples_%d', ns);
-
-for i = 1:1:numel(files)
-    if (contains(files(i).name, str1) && contains(files(i).name, str2) && contains(files(i).name, str3) ...
-            && contains(files(i).name, str4) && contains(files(i).name, str5) && contains(files(i).name, str6))
-        vec = load(strcat('data/', files(i).name));
-        str_split = strsplit(files(i).name,"_");
-        vec(:).q = str2double(str_split(7));
-
-        if (vec(:).q == 0.75 || vec(:).q == 0.50)
-            P = vec.P;
-            time = vec.time;
-            fpp = vec.fpp;
-            tfp = vec.tfp;
-    
-            fig = figure(4);
-            for k = 1:ndof
-                if (vec(:).q == 0.75)
-                    subplot(2,ndof,k);
-                    aux = sprintf('%s) q $= %.2f$; DOF: %d', letters(k), vec(:).q, k);
-                else
-                    subplot(2,ndof,k+ndof);
-                    aux = sprintf('%s) q$ = %.2f$; DOF: %d', letters(k+ndof), vec(:).q, k);
-                end
-                hold on
-                plot(time, P(k,:)','b','linewidth',2);
-                plot(tfp, fpp,'r--','linewidth',2);          
-                legend('Analytical','MCS')
-                title(aux, 'fontsize', 18)
-                xlabel('Time')
-                ylabel('Survival propability')
-                xlim([0 2])
-                ylim([0 1])
-                xticks([0 0.5 1 1.5 2])
-                grid(1)
-            end
-        end
-    end
-end
-
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/survival_prop_bw','-dpng','-r1000')
