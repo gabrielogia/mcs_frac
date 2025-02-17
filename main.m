@@ -19,7 +19,7 @@ is_base = false;
 nonstat = true;
 
 % Number of DOFs:
-ndof = 3;
+ndof = 15;
 
 % Power spectrum mag
 S0 = 0.2;

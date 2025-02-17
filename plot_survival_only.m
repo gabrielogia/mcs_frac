@@ -2,6 +2,7 @@
 clc
 clear
 close all
+warning('off','all')
 
 list_factory = fieldnames(get(groot,'factory'));
 index_interpreter = find(contains(list_factory,'Interpreter'));
@@ -126,6 +127,7 @@ for jj=1:numQ
                 plot(time, P(i,:)','r','linewidth',2);
                 plot(tfp, fpp,'--b','linewidth',2);
             end
+            fprintf("MSE: %.4f, q = %.2f, lambda = %.2f, dof: %d\n", mse(P(i,1:numel(fpp)),fpp), q, lam(ii), i)
             title(sprintf("%s) DOF: %d", col(i + (jj-1)*ndof), i))
             xlabel('Time')
             ylabel('Survival propability')
