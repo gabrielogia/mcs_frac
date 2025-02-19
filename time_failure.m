@@ -2,9 +2,9 @@ function [tf,amplitude] = time_failure(response,velocity,bar,omega_eq_2,time_out
     
    
     [ndof,nt,ns]=size(response);
+    
     for j=1:ndof
         we2(j,:) = interp1(time,omega_eq_2(j,:),time_out,'pchip')';
-       
     end
 
     amplitude = zeros(size(response));

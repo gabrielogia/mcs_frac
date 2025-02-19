@@ -29,8 +29,8 @@ end
 fig = figure(1);
 subplot(1, 2, 1)
 surf(time, freq, eps)
-xlabel('Time (s)')
-ylabel('Frequency (rad/s)')
+xlabel('Time')
+ylabel('Frequency')
 zlabel('EPS')
 colormap jet
 shading interp
@@ -38,8 +38,8 @@ view([65 11])
 
 subplot(1, 2, 2)
 surf(time, freq, eps)
-xlabel('Time (s)')
-ylabel('Frequency (rad/s)')
+xlabel('Time')
+ylabel('Frequency')
 colormap jet
 shading interp
 view([0 90])
