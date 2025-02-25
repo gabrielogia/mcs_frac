@@ -18,7 +18,7 @@ set(groot,'defaultAxesFontSize', 16)
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "bw";
+oscillator = "duffing";
 
 % Number of DOFs:
 ndof = 3;

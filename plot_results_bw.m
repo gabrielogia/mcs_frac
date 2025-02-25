@@ -211,7 +211,9 @@ for i = 1:1:numel(files)
                 subplot(2,3,j)
                 hold on
                 surf(time_out,av,pr(:,:,j));
-                plot3(time_out,ones(size(time_out))*barrier(j),ha,'r','linewidth',2)
+                plot3(time_out,ones(size(time_out))*0.0076,ha,'r','linewidth',2) %0.0076, 0.0151, 0.0227
+                plot3(time_out,ones(size(time_out))*0.0151,ha,'--r','linewidth',2) %0.0076, 0.0151, 0.0227
+                plot3(time_out,ones(size(time_out))*0.0227,ha,':r','linewidth',2) %0.0076, 0.0151, 0.0227
                 clim([0, 300])
                 ylim([0, 0.03])
                 xlim([0 4])
@@ -225,7 +227,9 @@ for i = 1:1:numel(files)
                 subplot(2,3,j+ndof)
                 hold on
                 surf(time_out,av,pa(:,:,j));
-                plot3(time_out,ones(size(time_out))*barrier(j),ha,'r','linewidth',2)
+                plot3(time_out,ones(size(time_out))*0.0076,ha,'r','linewidth',2) %0.0076, 0.0151, 0.0227
+                plot3(time_out,ones(size(time_out))*0.0151,ha,'--r','linewidth',2) %0.0076, 0.0151, 0.0227
+                plot3(time_out,ones(size(time_out))*0.0227,ha,':r','linewidth',2) %0.0076, 0.0151, 0.0227
                 clim([0, 300])
                 ylim([0, 0.03])
                 xlim([0 4])

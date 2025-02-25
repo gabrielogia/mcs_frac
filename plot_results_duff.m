@@ -113,7 +113,7 @@ for i = 1:1:numel(files)
 end
 
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/equivalent_stiffness_and_beta_different_q_bw','-dpng','-r1000')
+print(fig,'plots/equivalent_stiffness_and_beta_different_q_duff','-dpng','-r1000')
 
 %% survival probability
 lambda = 0.25;
@@ -168,7 +168,7 @@ end
 barrier = vec.barrier;
 
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/survival_prop_bw','-dpng','-r1000')
+print(fig,'plots/survival_prop_duff','-dpng','-r1000')
 
 %% Plot amplitude PDF
 epx = 1.00;
@@ -205,7 +205,9 @@ for i = 1:1:numel(files)
                 subplot(2,3,j)
                 hold on
                 surf(time_out,av,pr(:,:,j));
-                plot3(time_out,ones(size(time_out))*barrier(j),ha,'r','linewidth',2)
+                plot3(time_out,ones(size(time_out))*0.0070,ha,'r','linewidth',2) %0.0070, 0.0141, 0.0211
+                plot3(time_out,ones(size(time_out))*0.0141,ha,'--r','linewidth',2) %0.0070, 0.0141, 0.0211
+                plot3(time_out,ones(size(time_out))*0.0211,ha,':r','linewidth',2) %0.0070, 0.0141, 0.0211
                 clim([0, 300])
                 ylim([0, 0.03])
                 xlim([0 4])
@@ -219,7 +221,9 @@ for i = 1:1:numel(files)
                 subplot(2,3,j+ndof)
                 hold on
                 surf(time_out,av,pa(:,:,j));
-                plot3(time_out,ones(size(time_out))*barrier(j),ha,'r','linewidth',2)
+                plot3(time_out,ones(size(time_out))*0.0070,ha,'r','linewidth',2) %0.0070, 0.0141, 0.0211
+                plot3(time_out,ones(size(time_out))*0.0141,ha,'--r','linewidth',2) %0.0070, 0.0141, 0.0211
+                plot3(time_out,ones(size(time_out))*0.0211,ha,':r','linewidth',2) %0.0070, 0.0141, 0.0211
                 clim([0, 300])
                 ylim([0, 0.03])
                 xlim([0 4])
@@ -236,4 +240,4 @@ for i = 1:1:numel(files)
 end
 
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
-print(fig,'plots/amplitude_pdf_bw','-dpng','-r1000')
+print(fig,'plots/amplitude_pdf_duff','-dpng','-r1000')
