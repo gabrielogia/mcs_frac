@@ -2,7 +2,7 @@ clc
 clear
 close all
 
-ndof_vec = [3 6 9 12];
+ndof_vec = [3 6 9 12 15];
 
 for i=1:numel(ndof_vec)
     ndof = ndof_vec(i);
@@ -10,5 +10,5 @@ for i=1:numel(ndof_vec)
     load(strcat("data/firsttimepassage_", str))
     
     error = immse(P(:,1:size(survival_prob_ksd,2)), survival_prob_ksd);
-    disp(sprintf("NDOF %d; MSE: %.3f", ndof, error));
+    fprintf("NDOF %d; MSE: %.4f\n", ndof, error);
 end
