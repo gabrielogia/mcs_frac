@@ -18,7 +18,7 @@ set(groot,'defaultAxesFontSize', 16)
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Number of DOFs:
 ndof = 3;
@@ -53,7 +53,7 @@ lam = 0.25;
 
 %% plot survival for different q and lambda
 col = ["a", "b", "c"];
-Q = [0.5 0.75];
+Q = [0.5 0.75 0.999];
 numQ = numel(Q);
 
 for jj=1:numQ
@@ -86,20 +86,26 @@ for jj=1:numQ
             if (lam(ii) == 0.25)
                 if (q == 0.75)
                     plot(time, P(i,:)','k','linewidth',2);
-                else
+                elseif (q == 0.50)
                     plot(time, P(i,:)','--k','linewidth',2);
+                else
+                    plot(time, P(i,:)',':k','linewidth',2);
                 end
             elseif (lam(ii) == 0.50)
                 if (q == 0.75)
                     plot(time, P(i,:)','b','linewidth',2);
-                else
+                elseif (q == 0.50)
                     plot(time, P(i,:)','--b','linewidth',2);
+                else
+                    plot(time, P(i,:)',':b','linewidth',2);
                 end
             else
                 if (q == 0.75)
                     plot(time, P(i,:)','r','linewidth',2);
-                else
+                elseif (q == 0.50)
                     plot(time, P(i,:)','--r','linewidth',2);
+                else
+                    plot(time, P(i,:)',':r','linewidth',2);
                 end
             end
             title(sprintf("%s) DOF: %d", col(i), i))
@@ -118,7 +124,10 @@ lg = legend("$\lambda$ = 0.25, $q$ = 0.50", ...
        "$\lambda$ = 0.75, $q$ = 0.50", ...
        "$\lambda$ = 0.25, $q$ = 0.75", ...
        "$\lambda$ = 0.50, $q$ = 0.75", ...
-       "$\lambda$ = 0.75, $q$ = 0.75");
-lg.Position(1:2) = [0.68 0.6];
+       "$\lambda$ = 0.75, $q$ = 0.75", ...
+       "$\lambda$ = 0.25, $q$ = 1.00", ...
+       "$\lambda$ = 0.50, $q$ = 1.00", ...
+       "$\lambda$ = 0.75, $q$ = 1.00");
+lg.Position(1:2) = [0.68 0.46];
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 250]);
 print(fig,strcat('plots/survival_prop_only_', oscillator),'-dpng','-r1000')
