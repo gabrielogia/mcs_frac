@@ -24,8 +24,8 @@ str3 = sprintf('barrier_%.2f', lambda);
 str4 = sprintf('ndof_%d', ndof);
 str5 = sprintf('mcssamples_%d', ns);
 
-markers = ["-", "-."];
-letters = ["a", "b", "b"];
+markers = ["-", "-.", ":"];
+letters = ["a", "b", "c"];
 
 for i = 1:1:numel(files)
     if(contains(files(i).name, str0) && contains(files(i).name, str1) && ...
@@ -38,6 +38,8 @@ for i = 1:1:numel(files)
             marker = markers(1);
         elseif (vec(:).q == 0.75)
             marker = markers(2);
+        elseif (vec(:).q == 1.00)
+            marker = markers(3);
         else
             marker = "";
         end
@@ -62,7 +64,7 @@ for i = 1:1:numel(files)
                 xlim([0 4])
                 ylim([0 1600])
                 xticks([0 1 2 3 4])
-                legend('q = 0.5', 'q = 0.75')
+                legend('q = 0.50', 'q = 0.75', 'q = 1.00')
             end
         end
     end
@@ -82,6 +84,8 @@ for i = 1:1:numel(files)
             marker = markers(1);
         elseif (vec(:).q == 0.75)
             marker = markers(2);
+        elseif (vec(:).q == 1.00)
+            marker = markers(3);
         else
             marker = "";
         end
@@ -104,15 +108,15 @@ for i = 1:1:numel(files)
                 title(aux, 'fontsize', 18)
                 grid(1);
                 xlim([0 4])
-                ylim([0 45])
+                ylim([0 80])
                 xticks([0 1 2 3 4])
-                legend('q = 0.5', 'q = 0.75', 'location', 'north')
+                legend('q = 0.50', 'q = 0.75', 'q = 1.00', 'location', 'north')
             end
         end
     end
 end
 
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
+set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 550]);
 print(fig,'plots/equivalent_stiffness_and_beta_different_q_duff','-dpng','-r1000')
 
 %% survival probability
@@ -125,7 +129,7 @@ str2 = sprintf('epx_%.2f', eps);
 str3 = sprintf('barrier_%.2f', lambda);
 str5 = sprintf('ndof_%d', ndof);
 str6 = sprintf('mcssamples_%d', ns);
-letters = ["a" "b" "c" "d" "e" "f"];
+letters = ["a" "b" "c" "d" "e" "f" "g" "h" "i"];
 
 for i = 1:1:numel(files)
     if (contains(files(i).name, str1) && contains(files(i).name, str2) && contains(files(i).name, str3) ...
@@ -134,7 +138,7 @@ for i = 1:1:numel(files)
         str_split = strsplit(files(i).name,"_");
         vec(:).q = str2double(str_split(7));
 
-        if (vec(:).q == 0.75 || vec(:).q == 0.50)
+        if (vec(:).q == 0.75 || vec(:).q == 0.50 || vec(:).q == 1.00)
             P = vec.P;
             time = vec.time;
             fpp = vec.survival_prob_ksd;
@@ -142,12 +146,15 @@ for i = 1:1:numel(files)
     
             fig = figure(4);
             for k = 1:ndof
-                if (vec(:).q == 0.75)
-                    subplot(2,ndof,k);
-                    aux = sprintf('%s) q $= %.2f$; DOF: %d', letters(k), vec(:).q, k);
+                if (vec(:).q == 1.00)
+                    subplot(3,ndof,k);
+                    aux = sprintf('%s) $q = %.2f$; DOF: %d', letters(k), vec(:).q, k);
+                elseif (vec(:).q == 0.75)
+                    subplot(3,ndof,k+ndof);
+                    aux = sprintf('%s) $q = %.2f$; DOF: %d', letters(k+ndof), vec(:).q, k);
                 else
-                    subplot(2,ndof,k+ndof);
-                    aux = sprintf('%s) q$ = %.2f$; DOF: %d', letters(k+ndof), vec(:).q, k);
+                    subplot(3,ndof,k+2*ndof);
+                    aux = sprintf('%s) $q = %.2f$; DOF: %d', letters(k+2*ndof), vec(:).q, k);
                 end
                 plot(time, P(k,:)','b','linewidth',2);          
                 title(aux, 'fontsize', 18)
@@ -167,7 +174,7 @@ end
 
 barrier = vec.barrier;
 
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
+set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 550]);
 print(fig,'plots/survival_prop_duff','-dpng','-r1000')
 
 %% Plot amplitude PDF
@@ -182,7 +189,7 @@ str3 = sprintf('barrier_%.2f', lambda);
 str4 = sprintf('ndof_%d', ndof);
 str5 = sprintf('mcssamples_%d', ns);
 
-letters = ["a" "b" "c" "d" "e" "f"];
+letters = ["a" "b" "c" "d" "e" "f" "g" "h" "i"];
 
 for i = 1:1:numel(files)    
     if(contains(files(i).name, str0) && contains(files(i).name, str1) && contains(files(i).name, str2) && ...
@@ -239,5 +246,5 @@ for i = 1:1:numel(files)
     end
 end
 
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 350]);
+set(fig,'papersize',[6.0 5.5], 'Position',[200 200 900 550]);
 print(fig,'plots/amplitude_pdf_duff','-dpng','-r1000')
