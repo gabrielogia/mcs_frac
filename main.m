@@ -12,20 +12,20 @@ rng(1111);
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "bw";
+oscillator = "duffing";
 
 % Is Base motion / non-stationary (excitation):
 is_base = false;
 nonstat = true;
 
 % Number of DOFs:
-ndof = 15;
+ndof = 3;
 
 % Power spectrum mag
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.75; 
+q = 0.999; 
 
 % Nonlinearity parameter:
 epx = 1.0*ones(1,ndof);
