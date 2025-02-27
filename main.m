@@ -50,7 +50,7 @@ xy=y0_bw;
 T = 11;
 
 % Barrier:
-lam = 0.75;
+lam = 0.50;
 
 % Time increment for the Monte Carlo simulation.
 dT = 1e-3;
