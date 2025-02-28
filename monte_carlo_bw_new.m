@@ -27,9 +27,17 @@ function [amplitude, time_out, first_passage_time] = monte_carlo_bw_new(ns,M,C,K
     
     parfor i=1:ns
         wv = simulate_process(tt, ndof, EPS, nonstat, is_base, fmax_ps);
-        xini = zeros(4*ndof,1);
-        [t1,X] = fde45_mdof_bw(@(t,x,w) fun_fde_mdof_bw_new(t,x,ndof,MiC,MiKa,MiK1_a,Mi,...
-            is_base,w,A_bw,gamma1,beta1,nn, xy), tt, xini, q, wv);
+
+        if (q == 0.999)
+            xini = zeros(3*ndof,1);
+            [t1,X] = ode45(@(t,x) fun_fde_mdof_bw(t, x, MiC, MiKa, MiK1_a, Mi, A_bw, gamma1, beta1, nn, ndof, wv, xy, tt), tt, xini);
+            t1 = t1';
+            X = X';
+        else
+            xini = zeros(4*ndof,1);
+            [t1,X] = fde45_mdof_bw(@(t,x,w) fun_fde_mdof_bw_new(t,x,ndof,MiC,MiKa,MiK1_a,Mi,...
+                is_base,w,A_bw,gamma1,beta1,nn, xy), tt, xini, q, wv);
+        end
 
         for j=1:ndof
             xint = interp1(t1,X(j, :),time_out,'pchip');
@@ -38,6 +46,7 @@ function [amplitude, time_out, first_passage_time] = monte_carlo_bw_new(ns,M,C,K
             x = xint;
             dx = vint;
             amp = sqrt(x.^2 + dx.^2./interp1(time,omega_eq_2(j,:),time_out,'pchip'));
+            
             amplitude(j,:,i) = amp;
             time_aux = time_out(abs(amp) > barrier(j));
 

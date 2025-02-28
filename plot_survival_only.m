@@ -19,7 +19,7 @@ set(groot,'defaultAxesFontSize', 16)
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "bw";
+oscillator = "duffing";
 
 % Number of DOFs:
 ndof = 3;
@@ -61,7 +61,7 @@ ns = 14000;
 %% plot survival for different q and lambda
 col = ["a" "b" "c" "d" "e" "f" "g" "h" "i"];
 
-Q = [0.5 0.75];
+Q = [0.5 0.75 1.00];
 numQ = numel(Q);
 
 for jj=1:numQ
@@ -128,12 +128,12 @@ for jj=1:numQ
                 plot(tfp, fpp,'--b','linewidth',2);
             end
             fprintf("MSE: %.4f, q = %.2f, lambda = %.2f, dof: %d\n", mse(P(i,1:numel(fpp)),fpp), q, lam(ii), i)
-            title(sprintf("%s) DOF: %d", col(i + (jj-1)*ndof), i))
+            title(sprintf("%s) $q = %.2f$, DOF: %d", col(i + (jj-1)*ndof), q, i))
             xlabel('Time')
             ylabel('Survival propability')
-            xlim([0 3.5])
+            xlim([0 4])
             ylim([0 1])
-            xticks([0 0.5 1.0 1.5 2.0 2.5 3.0 3.5])
+            xticks([0 1 2 3 4])
             grid on;
         end
     end
@@ -142,7 +142,7 @@ end
 legend('Analytical: $\lambda$ = 0.25', 'MCS: $\lambda$ = 0.25', ...
     'Analytical: $\lambda$ = 0.50', 'MCS: $\lambda$ = 0.50', ...
     'Analytical: $\lambda$ = 0.75', 'MCS: $\lambda$ = 0.75',  ...
-    'Location',[0.067040182749433,0.491111111111111,0.857126483917236,0.026044444508022], ...
-    'Orientation', 'horizontal')
+    'Orientation', 'horizontal',...
+    'Position', [0.154605870928083,0.022844444380866,0.734679843357631,0.026044444508023])
 set(fig,'papersize',[6.0 5.5], 'Position',[200 200 1400 900]);
 print(fig,strcat('plots/survival_prop_only_', oscillator),'-dpng','-r1000')

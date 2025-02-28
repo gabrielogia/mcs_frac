@@ -62,7 +62,7 @@ for i = 1:1:numel(files)
                 ylabel('$\omega^2_{e}(t)$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
                 title(aux, 'fontsize', 18)
-                grid(1);
+                grid on;
                 xlim([0 4])
                 ylim([0 1600])
                 xticks([0 1 2 3 4])
@@ -108,7 +108,7 @@ for i = 1:1:numel(files)
                 ylabel('$\beta_{e}(t)$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
                 title(aux, 'fontsize', 18)
-                grid(1);
+                grid on;
                 xlim([0 4])
                 ylim([0 85])
                 xticks([0 1 2 3 4])
@@ -184,7 +184,7 @@ print(fig,'plots/survival_prop_bw','-dpng','-r1000')
 %% Plot amplitude PDF
 a = 0.50;
 lambda = 0.25;
-q = 0.75;
+q = 1.00;
 xy = 0.00;
 ndof = 3;
 ns = 14000;

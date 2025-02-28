@@ -13,7 +13,7 @@ function P=survival_probability(bar, c, time, num_time, beta_eq, weq2, N, S0)
     end
     
     for dof=1:ndof
-        tf=@(z)(interp1(time,pi./sqrt(weq2(dof,:)),z,'pchip'));
+        tf=@(z)(interp1(time,0.5*pi./sqrt(weq2(dof,:)),z,'pchip'));
         ti=0;
 
         cont=2;
