@@ -19,7 +19,7 @@ set(groot,'defaultAxesFontSize', 16)
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "duffing";
+oscillator = "bw";
 
 % Number of DOFs:
 ndof = 3;
@@ -108,7 +108,7 @@ for jj=1:numQ
             end
         end
 
-        P = survival_probability(B*ones(ndof), c, time, numel(time), beta_eq, omega_eq_2, 15, S0);
+        P = survival_probability(B*ones(ndof), c, time, numel(time), beta_eq, omega_eq_2, 15, S0, oscillator, q);
     
         fig = figure(1);
         for i=1:ndof
