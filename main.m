@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.9999; 
+q = 0.75; 
 
 % Duffing Nonlinearity parameter:
 epx = 1.0*ones(1,ndof);
@@ -168,12 +168,17 @@ else
 end
 
 %% plot variance
-plot(time, varx_sl)
+figure;
+plot(time, varx_sl, '--','LineWidth', 2)
 hold on;
-plot(time_out, varx_mcs)
+plot(time_out, varx_mcs, ':', 'LineWidth', 2)
+plot(t, c', 'LineWidth', 2)
 xlabel('Time')
 ylabel('Variance')
-legend('DOF 1 - SL', 'DOF 2 - SL', 'DOF 3 - SL','DOF 1 - MCS', 'DOF 2 - MCS', 'DOF 3 - MCS');
+legend('DOF 1 - SL', 'DOF 2 - SL', 'DOF 3 - SL', ...
+    'DOF 1 - MCS', 'DOF 2 - MCS', 'DOF 3 - MCS', ...
+    'DOF 1 - MA', 'DOF 2 - MA', 'DOF 3 - MA', 'Location', 'northwest');
+xlim([0 max(time)])
 
 %% First passage
 disp("Getting first passage")
