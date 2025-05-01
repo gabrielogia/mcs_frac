@@ -53,7 +53,7 @@ xy=y0_bw;
 T = 11;
 
 % Barrier:
-lam = 0.50;
+lam = 0.25;
 
 % Time increment for the Monte Carlo simulation.
 dT = 1e-3;
@@ -69,7 +69,7 @@ end
 fmax_ps = 50;
 
 % Number of samples in the MCS:
-ns = 3000;
+ns = 14000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 400;
