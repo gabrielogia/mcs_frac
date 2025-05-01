@@ -11,7 +11,7 @@ for i = 1:length(index_interpreter)
     set(groot, default_name,'latex');
 end
 
-set(groot,'defaultAxesFontSize', 16)
+set(groot,'defaultAxesFontSize', 11)
 
 %%
 
@@ -59,9 +59,9 @@ dT = 1e-3;
 ns = 14000;
 
 %% plot survival for different q and lambda
-col = ["a" "b" "c" "d" "e" "f" "g" "h" "i"];
+col = ["a" "b" "c"];
 
-Q = [0.5 0.75 1.00];
+Q = [0.5];
 numQ = numel(Q);
 
 for jj=1:numQ
@@ -115,7 +115,7 @@ for jj=1:numQ
             fpt = tf(:,i);
             fpt = fpt(fpt>0);
             [fpp,tfp]=ksdensity(fpt,'width',0.1,'Function','survivor');
-            subplot(numQ,ndof,i + (jj-1)*ndof);
+            subplot(ndof,numQ,i + (jj-1)*ndof);
             hold on
             if (lam(ii) == 0.25)
                 plot(time, P(i,:)','k','linewidth',2);
@@ -128,12 +128,12 @@ for jj=1:numQ
                 plot(tfp, fpp,'--b','linewidth',2);
             end
             fprintf("MSE: %.4f, q = %.2f, lambda = %.2f, dof: %d\n", mse(P(i,1:numel(fpp)),fpp), q, lam(ii), i)
-            title(sprintf("%s) $q = %.2f$, DOF: %d", col(i + (jj-1)*ndof), q, i))
+            title(sprintf("%s) DOF: %d", col(i + (jj-1)*ndof), i))
             xlabel('Time')
-            ylabel('Survival propability')
-            xlim([0 4])
+            ylabel('Survival')
+            xlim([0 2.5])
             ylim([0 1])
-            xticks([0 1 2 3 4])
+            xticks([0 0.5 1 1.5 2 2.5])
             grid on;
         end
     end
@@ -142,7 +142,6 @@ end
 legend('Analytical: $\lambda$ = 0.25', 'MCS: $\lambda$ = 0.25', ...
     'Analytical: $\lambda$ = 0.50', 'MCS: $\lambda$ = 0.50', ...
     'Analytical: $\lambda$ = 0.75', 'MCS: $\lambda$ = 0.75',  ...
-    'Orientation', 'horizontal',...
-    'Position', [0.154605870928083,0.022844444380866,0.734679843357631,0.026044444508023])
-set(fig,'papersize',[6.0 5.5], 'Position',[200 200 1400 900]);
-print(fig,strcat('plots/survival_prop_only_', oscillator),'-dpng','-r1000')
+    'Orientation', 'horizontal')
+%set(fig,'papersize',[6.0 5.5], 'Position',[200 200 1400 900]);
+%print(fig,strcat('plots/survival_prop_only_', oscillator),'-dpng','-r1000')

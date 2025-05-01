@@ -11,7 +11,7 @@ for i = 1:length(index_interpreter)
     set(groot, default_name,'latex');
 end
 
-set(groot,'defaultAxesFontSize', 16)
+set(groot,'defaultAxesFontSize', 11)
 
 %% Equivalent stiffness and damping
 a = 0.50;
@@ -26,7 +26,7 @@ str3 = sprintf('barrier_%.2f', lambda);
 str4 = sprintf('ndof_%d', ndof);
 str5 = sprintf('mcssamples_%d', ns);
 
-markers = ["-", "-.", ":"];
+markers = ["-", "-."];
 letters = ["a", "b", "c"];
 
 for i = 1:1:numel(files)
@@ -40,8 +40,6 @@ for i = 1:1:numel(files)
             marker = markers(1);
         elseif (vec(:).q == 0.75)
             marker = markers(2);
-        elseif (vec(:).q == 1.00)
-            marker = markers(3);
         else
             marker = "";
         end
@@ -61,12 +59,12 @@ for i = 1:1:numel(files)
                 xlabel('Time')
                 ylabel('$\omega^2_{e}(t)$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
-                title(aux, 'fontsize', 18)
+                title(aux)
                 grid on;
                 xlim([0 4])
                 ylim([0 1600])
                 xticks([0 1 2 3 4])
-                legend('q = 0.50', 'q = 0.75', 'q = 1.00')
+                legend('q = 0.50', 'q = 0.75')
             end
         end
     end
@@ -86,8 +84,6 @@ for i = 1:1:numel(files)
             marker = markers(1);
         elseif (vec(:).q == 0.75)
             marker = markers(2);
-        elseif (vec(:).q == 1.00)
-            marker = markers(3);
         else
             marker = "";
         end
@@ -107,12 +103,12 @@ for i = 1:1:numel(files)
                 xlabel('Time')
                 ylabel('$\beta_{e}(t)$')
                 aux = sprintf("%s) DOF %d", letters(dof), dof);
-                title(aux, 'fontsize', 18)
+                title(aux)
                 grid on;
                 xlim([0 4])
-                ylim([0 85])
+                ylim([0 60])
                 xticks([0 1 2 3 4])
-                legend('q = 0.50', 'q = 0.75', 'q = 1.00', 'location', 'north')
+                legend('q = 0.50', 'q = 0.75','location', 'north')
             end
         end
     end
