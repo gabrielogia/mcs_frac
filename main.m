@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.50; 
+q = 0.75; 
 
 % Duffing Nonlinearity parameter:
 epx = 1.0*ones(1,ndof);
@@ -143,7 +143,7 @@ for i=1:ndof
 end
 
 %% Monte Carlo Simulation
-if 1
+if run_mcs
     disp('Running MCS:')
     
     tic
