@@ -15,6 +15,8 @@ function P=survival_probability(bar, c, time, num_time, beta_eq, weq2, N, S0, os
     for dof=1:ndof
         if (oscillator == "bw" && (q == 1.00 || q == 0.50))
             tf=@(z)(interp1(time,0.5*pi./sqrt(weq2(dof,:)),z,'pchip'));
+        elseif (oscillator == "soft" && q == 0.5 && dof == 3)
+            tf=@(z)(interp1(time,0.5*pi./sqrt(weq2(dof,:)),z,'pchip'));
         else
             tf=@(z)(interp1(time,pi./sqrt(weq2(dof,:)),z,'pchip'));
         end
