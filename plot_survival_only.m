@@ -19,7 +19,7 @@ set(groot,'defaultAxesFontSize', 11)
 power_spectrum = "eps";
 
 % Oscillator ('bw', 'duffing')
-oscillator = "bw";
+oscillator = "soft";
 
 % Number of DOFs:
 ndof = 3;
@@ -32,6 +32,7 @@ q = 0.75;
 
 % Nonlinearity parameter:
 epx = 1.0*ones(1,ndof);
+alpha = 0.5*ones(1,ndof);
 
 % Mass, damping, and stiffness vectors: 
 mass = 1*ones(1,ndof); 
@@ -71,8 +72,10 @@ for jj=1:numQ
     
     if (oscillator == "bw")
         str = strcat(str, sprintf('_bwparameters_a_%.2f_A_%.2f_beta_%.2f_gamma_%.2f_xy_%.2f', max(a_bw), A_bw, beta_bw, gamma_bw, xy));
-    else
+    elseif (oscillator == "duffing")
         str = strcat(str, sprintf('_duffingparameter_epx_%.2f', max(epx)));
+    else
+        str = strcat(str, sprintf('_softparameter_alpha_%.2f', max(alpha)));
     end
     
     % load mcs previous results
