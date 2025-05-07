@@ -25,7 +25,7 @@ ndof = 3;
 S0 = 0.2;
 
 % Fractional derivative:
-q = 0.75; 
+q = 0.9999; 
 
 % Duffing Nonlinearity parameter:
 epx = 1.0*ones(1,ndof);
@@ -53,7 +53,7 @@ xy=y0_bw;
 T = 11;
 
 % Barrier:
-lam = 0.75;
+lam = 0.25;
 
 % Time increment for the Monte Carlo simulation.
 dT = 1e-3;
@@ -120,7 +120,7 @@ disp("Getting omega and beta.");
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
 
-ic = 0.000005;
+ic = 0.00000005;
 c = zeros(ndof, numel(time));
 
 for i=1:ndof
@@ -143,7 +143,7 @@ for i=1:ndof
 end
 
 %% Monte Carlo Simulation
-if run_mcs
+if 1
     disp('Running MCS:')
     
     tic
@@ -162,7 +162,7 @@ if run_mcs
     end
     toc
 
-    save(strcat('data/mcs/mcs_', str, '.mat'), "amplitude", "time_out", "first_passage_time")
+    save(strcat('data/mcs/mcs_', str, '.mat'), "varx_mcs", "amplitude", "time_out", "first_passage_time")
 else
     disp('Jumping MCS')
 end

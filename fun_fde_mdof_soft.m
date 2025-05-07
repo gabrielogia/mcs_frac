@@ -16,7 +16,7 @@ function x_dot = fun_fde_mdof_soft(t,x,ndof,MiC,MiK,Mi,mass,damping,stiffness,al
     g0 = zeros(ndof, 1);
     for i=1:ndof
         f(i,1) = scale(i)*w(i);
-        g0(i,1) = abs(x(i))^alpha(i)*sign(x(i));%epx(i)*stiffness(i)*x(i).^3;
+        g0(i,1) = 40*abs(x(i))^alpha(i)*sign(x(i));%epx(i)*stiffness(i)*x(i).^3;
     end
 
     Mf = -Mi*f;

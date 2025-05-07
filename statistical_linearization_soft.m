@@ -64,7 +64,7 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
                 sx2(l) = Ex;
                 sv2(l) = Exd;
                 ceq(l) = 3*0*c(l)*Exd;
-                keq(l) = (alpha(l)*2^(alpha(l)/2)*sqrt(Ex)^(alpha(l)-1)*gamma(alpha(l)/2))/(sqrt(2*pi));
+                keq(l) = 40*alpha(l)*2^((alpha(l) - 1)/2)*sqrt(Ex)^(alpha(l)-1)*gamma(alpha(l)/2)*pi^(-1/2);
             end
             
             [Ceq, Keq] = get_equivalent_ck(ceq, keq, ndof);
