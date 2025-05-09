@@ -53,7 +53,7 @@ xy=y0_bw;
 T = 11;
 
 % Barrier:
-lam = 0.25;
+lam = 0.75;
 
 % Time increment for the Monte Carlo simulation.
 dT = 1e-3;
@@ -73,7 +73,7 @@ ns = 14000;
 
 % Discretization in time and frequency for the Statistical Linearization:
 ntime = 400;
-nfreq = 1000;
+nfreq = 2000;
 
 % Base string to save files
 str = sprintf('oscillator_%s_ndof_%d_fractional_%.2f_dt_%.4f_mcssamples_%d_damping_%.2f_stiffness_%.2f_barrier_%.2f_powerspectrum_%s_S0_%.2f', ...
@@ -120,7 +120,7 @@ disp("Getting omega and beta.");
 %% Get c(t) by solving the ODE from stochastic averaging.
 disp("Solving the ODE to find c(t):")
 
-ic = 0.00000005;
+ic = 0.00000001;
 c = zeros(ndof, numel(time));
 
 for i=1:ndof
@@ -132,6 +132,8 @@ for i=1:ndof
 
     [t, c(i,:)] = ode89(@(t, c_aux) solve_c_mdof(t, c_aux, beta_eq_dof, omega_eq_2_dof, time,q, S0), time, ic);
 end
+
+c = abs(c);
 
 for i=1:ndof
     smaxt(i) = max(c(i,:));

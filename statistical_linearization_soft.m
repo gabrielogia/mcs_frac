@@ -3,7 +3,7 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
 
     Mt = M;
     tol = 1e-6;
-    maxiter = 30;
+    maxiter = 300;
     ntime = numel(time);
     nfreq = numel(freq);
 
@@ -19,7 +19,7 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
     for i=1:ntime 
         t = time(i);
         [Ceq, Keq] = get_equivalent_ck(ceq, keq, ndof);
-
+        
         sx2 = zeros(ndof, 1);
         sv2 = zeros(ndof, 1);
     
@@ -63,8 +63,8 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
              
                 sx2(l) = Ex;
                 sv2(l) = Exd;
-                ceq(l) = 3*0*c(l)*Exd;
-                keq(l) = 40*alpha(l)*2^((alpha(l) - 1)/2)*sqrt(Ex)^(alpha(l)-1)*gamma(alpha(l)/2)*pi^(-1/2);
+                ceq(l) = 0;
+                keq(l) = 0.05*k(l)*alpha(l)*2^((alpha(l) - 1)/2)*sqrt(Ex)^(alpha(l)-1)*gamma(alpha(l)/2)*pi^(-1/2);
             end
             
             [Ceq, Keq] = get_equivalent_ck(ceq, keq, ndof);
@@ -72,8 +72,8 @@ function [var_displacement, var_velocity, conv, k_eq_time, c_eq_time] =...
             dceq = abs(ceq - ceq_1)./ceq_1;
             dkeq = abs(keq - keq_1)./keq_1;
 
-            conv(i).ceq(:,itera+1) = abs(ceq - ceq_1);
-            conv(i).keq(:,itera+1) = abs(keq - keq_1);
+            conv(i).ceq(:,itera+1) = dceq;
+            conv(i).keq(:,itera+1) = dkeq;
 
             dceq_max = max(dceq);
             dkeq_max = max(dkeq);
