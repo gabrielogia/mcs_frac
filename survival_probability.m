@@ -8,11 +8,7 @@ function P=survival_probability(bar, c, time, num_time, beta_eq, weq2, N, S0, os
     for dof=1:ndof
         ti=0;
 
-        if oscillator == "soft" && q == 0.5 && dof == 3
-            tf = @(z)( interp1(time,0.5*pi./sqrt(weq2(dof,:)), z, 'pchip') );
-        else
-            tf = @(z)( interp1(time,1.4*pi./sqrt(weq2(dof,:)), z, 'pchip') );
-        end
+        tf = @(z)( interp1(time,1.4*pi./sqrt(weq2(dof,:)), z, 'pchip') );
 
         cont=2;
         time_domain(1) = ti;
